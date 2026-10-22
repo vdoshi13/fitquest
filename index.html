@@ -1,1 +1,1509 @@
-<h1>Hello FitQuest</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FitQuest">
+<meta name="theme-color" content="#10162B">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>FitQuest</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;800&family=Barlow:wght@400;500;600&display=swap" media="print" onload="this.media='all'">
+<script>const BOOT = null;</script>
+<style>
+:root{
+  --ink:#10162B; --panel:#1A2240; --panel2:#222B4E; --line:#2C365C;
+  --text:#EEF1FA; --muted:#98A1C0;
+  --ember:#FF8A3D; --gold:#FFD166; --tide:#5CC8FF; --good:#5BE3A0; --bad:#FF6B6B;
+  --display:'Barlow Condensed','Arial Narrow',system-ui,sans-serif;
+  --body:'Barlow',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --L:56%;
+  color-scheme:dark;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --ink:#F3F4FA; --panel:#FFFFFF; --panel2:#ECEEF7; --line:#DADEEC;
+    --text:#161B33; --muted:#5D6584;
+    --ember:#E0661A; --gold:#B98600; --tide:#0A8FD1; --good:#119A5B; --bad:#D63C3C;
+    --L:44%;
+    color-scheme:light;
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--ink);color:var(--text);font:16px/1.45 var(--body)}
+button,input,textarea,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--tide);outline-offset:2px}
+.wrap{max-width:520px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 16px calc(96px + env(safe-area-inset-bottom))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top);background:#10162B;z-index:50}
+.connect{max-width:420px;margin:8vh auto 0}
+.connect p{color:var(--muted);font-size:14px}
+.conn-line{font-size:13px;color:var(--muted);margin-top:14px;word-break:break-all}
+.conn-line button{background:none;border:0;padding:0;color:var(--tide);text-decoration:underline;font-size:13px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.brand{font:800 26px/1 var(--display);letter-spacing:.5px}
+.brand b{color:var(--ember)}
+.sync{margin-left:auto;margin-right:10px;font-size:12px;color:var(--muted)}
+.icon-btn{background:var(--panel);border:1px solid var(--line);border-radius:12px;width:42px;height:42px;font-size:18px}
+.tab{display:none}.tab.on{display:block}
+h2{font:800 30px/1.1 var(--display);margin:4px 0 14px}
+h3{font:600 15px/1.2 var(--body);margin:0 0 10px;color:var(--muted)}
+.title-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.title-row h2{margin:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.muted{color:var(--muted)}.small{font-size:13px}
+.num{font-family:var(--display);font-variant-numeric:tabular-nums}
+.sec-title{font:800 22px/1.1 var(--display);margin:22px 0 10px}
+
+/* Scoreboard home */
+.greet{margin:-4px 0 12px}
+.greet-hi{font:800 26px/1.1 var(--display)}
+.greet-sub{font-size:14px;color:var(--muted);margin-top:2px}
+.sb-hero{background:#FF8A3D;color:#1A1205;border-radius:20px;padding:16px 16px 14px;margin-bottom:12px}
+.sb-top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.sb-rank{font-size:14px;font-weight:600}
+.sb-xp{font-size:48px;font-weight:800;line-height:1;margin-top:2px}
+.sb-xp small{font:600 16px var(--body)}
+.sb-badge{width:64px;height:64px;flex:none;border-radius:50%;background:#1A1205;color:#FFD166;display:grid;place-items:center;font-size:30px;font-weight:800}
+.sb-meter{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;height:12px;margin-top:12px}
+.sb-meter i{border-radius:2px;background:rgba(26,18,5,.22)}
+.sb-meter i.f{background:#1A1205}
+.sb-next{font-size:13px;font-weight:500;margin-top:7px}
+.sb-tiles{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sb-tile{border:0;border-radius:16px;padding:12px;text-align:left;min-height:96px;transition:transform .1s,background .6s}
+.sb-tile:active{transform:scale(.97)}
+.sb-tile .n{font-size:30px;font-weight:800;line-height:1}
+.sb-tile .l{font-size:13px;font-weight:600;margin-top:5px}
+.sb-tile .s{font-size:12px;margin-top:3px;opacity:.8}
+.t-red{background:#FF6B4A;color:#2A0A02}
+.t-fast{background:#5CC8FF;color:#04202F}
+.t-gold{background:#FFD166;color:#2E2200}
+.t-green{background:#5BE3A0;color:#032617}
+.sb-acts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sb-act{border:1px solid var(--line);background:var(--panel2);border-radius:14px;padding:13px 10px;font:800 18px/1 var(--display);letter-spacing:.2px}
+.a-ember{color:var(--ember)}.a-tide{color:var(--tide)}
+.sb-act:active{transform:scale(.97)}
+.sb-recent .dot{border-radius:10px;font-size:17px}
+.sb-recent .d-workout{background:color-mix(in srgb,#FF8A3D 22%,var(--panel))}
+.sb-recent .d-fast{background:color-mix(in srgb,#5CC8FF 22%,var(--panel))}
+.sb-recent .d-goal{background:color-mix(in srgb,#FFD166 25%,var(--panel))}
+.sb-recent .tag{margin-left:auto;font-size:12px;color:var(--muted);white-space:nowrap}
+
+/* Level hero */
+.hero{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center;padding:18px;border-radius:20px;background:linear-gradient(160deg,var(--panel2),var(--panel))}
+.jersey{font:800 84px/.85 var(--display);color:var(--gold);min-width:70px;text-align:center}
+.jersey small{display:block;font:600 13px/1 var(--body);color:var(--muted);margin-top:6px}
+.rank{font:800 28px/1 var(--display);margin-bottom:10px}
+.meter{display:grid;grid-template-columns:repeat(20,1fr);gap:3px;height:14px}
+.meter i{background:var(--line);border-radius:2px}
+.meter i.f{background:var(--gold)}
+.xp-line{display:flex;justify-content:space-between;gap:8px;margin-top:7px;font-size:13px;color:var(--muted)}
+
+.streaks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.streak{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.streak .num{font-size:34px;font-weight:800;line-height:1}
+.streak .small{color:var(--muted);margin-top:4px}
+.streak.ember .num{color:var(--ember)}.streak.tide .num{color:var(--tide)}.streak.gold .num{color:var(--gold)}
+
+.goal{margin-bottom:14px}.goal:last-child{margin-bottom:0}
+.goal-top{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:6px}
+.goal-top .num{font-size:22px;font-weight:800}
+.pips{display:flex;gap:6px}
+.pips i{flex:1;height:10px;border-radius:5px;background:var(--line)}
+.pips.ember i.f{background:var(--ember)}.pips.tide i.f{background:var(--tide)}
+.hit{color:var(--good);font-size:13px;font-weight:600}
+.goal-tap{display:block;width:100%;text-align:left;background:none;border:0;padding:10px;margin:0 -10px 4px;width:calc(100% + 20px);border-radius:12px}
+.goal-tap:active{background:var(--panel2)}
+.goal-tap .plus{display:inline-grid;place-items:center;width:22px;height:22px;margin-left:8px;border-radius:50%;background:var(--gold);color:#1A1205;font:800 16px/1 var(--body);vertical-align:2px}
+.log-btn{color:var(--gold);border-color:var(--gold)}
+.auto{color:var(--tide)}
+.convert{margin-top:10px;padding:10px;border-radius:10px;background:var(--panel2);font-size:13px;color:var(--muted)}
+.convert button{display:block;margin-top:6px;background:none;border:0;padding:0;color:var(--tide);font-weight:600;text-decoration:underline}
+#quickLog .ex-card{margin-bottom:4px}
+
+.challenge{border-color:var(--ember);border-style:dashed}
+.challenge .txt{font:800 22px/1.15 var(--display);margin-bottom:10px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--ember);transition:width .4s}
+.bar.gold span{background:var(--gold)}
+
+.fast-mini{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.fast-mini .num{font-size:30px;font-weight:800;color:var(--tide)}
+
+.list{list-style:none;margin:0;padding:0}
+.list li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid var(--line)}
+.list li:first-child{border-top:0;padding-top:0}
+.list .dot{width:34px;height:34px;flex:none;border-radius:10px;display:grid;place-items:center;font-size:16px;background:var(--panel2)}
+.list .t{font-weight:600}.list .s{font-size:13px;color:var(--muted);word-break:break-word}
+.list .xp{margin-left:auto;font:800 18px var(--display);color:var(--gold);white-space:nowrap}
+.empty{color:var(--muted);font-size:14px}
+
+/* Forms */
+label.f{display:block;font-size:14px;font-weight:600;color:var(--muted);margin:16px 0 8px}
+.seg{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:4px}
+.seg button{border:0;background:none;padding:10px;border-radius:10px;font-weight:600;color:var(--muted)}
+.seg button.on{background:var(--panel2);color:var(--text);box-shadow:inset 0 -2px 0 var(--ember)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:9px 14px;font-weight:500}
+.chip.on{border-color:var(--ember);background:color-mix(in srgb,var(--ember) 18%,var(--panel))}
+.chip.sm{padding:7px 12px;font-size:14px}
+.chip .tm{color:var(--tide);margin-left:4px}
+.fast-tab .chip.on{border-color:var(--tide);background:color-mix(in srgb,var(--tide) 18%,var(--panel))}
+input[type=number],input[type=date],input[type=datetime-local],input[type=text],textarea{
+  width:100%;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:46px}
+textarea{resize:vertical}
+.stepper{display:grid;grid-template-columns:56px 1fr 56px;gap:8px}
+.stepper button{background:var(--panel);border:1px solid var(--line);border-radius:12px;font-size:24px}
+.stepper input{text-align:center;font:800 28px var(--display)}
+.ghost{background:none;border:1px dashed var(--line);border-radius:12px;padding:11px;width:100%;color:var(--muted);font-weight:600}
+.primary{display:flex;justify-content:center;gap:10px;align-items:baseline;width:100%;margin-top:20px;border:0;border-radius:16px;padding:16px;
+  background:var(--ember);color:#1A1205;font:800 22px/1 var(--display);letter-spacing:.3px}
+.primary.tide{background:var(--tide);color:#04202F}
+.primary:disabled{opacity:.55}
+.primary .pill{font:600 14px var(--body);background:rgba(0,0,0,.18);padding:3px 9px;border-radius:999px}
+.link{display:block;margin:14px auto 0;background:none;border:0;color:var(--muted);text-decoration:underline;font-size:14px}
+details{margin-top:14px}
+summary{color:var(--muted);font-size:14px;cursor:pointer;margin-bottom:8px}
+
+/* Exercise library + rows */
+.lib{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px}
+.lib .cats{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid var(--line);scrollbar-width:none}
+.lib .cats::-webkit-scrollbar{display:none}
+.lib .cats .chip{flex:none}
+select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px;min-height:46px;font-weight:600}
+.ex-other{margin-top:8px}
+.lib .chips{max-height:150px;overflow-y:auto}
+.ex-card{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--ember);border-radius:14px;padding:12px;margin-bottom:10px}
+.ex-card.timed{border-left-color:var(--tide)}
+.ex-card.cardio{border-left-color:var(--good)}
+.cardio .kind{color:var(--good);border-color:var(--good)}
+.ex-fields.two{grid-template-columns:1fr 1fr}
+.ex-card.flash{animation:flash .6s}
+@keyframes flash{50%{background:var(--panel2)}}
+.ex-top{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center}
+.ex-top input{font-weight:600}
+.kind{border:1px solid var(--line);background:var(--panel2);border-radius:999px;padding:8px 12px;font-size:13px;font-weight:600;white-space:nowrap}
+.timed .kind{color:var(--tide);border-color:var(--tide)}
+.rm{background:none;border:0;color:var(--muted);font-size:22px;width:32px}
+.ex-fields{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.ex-fields label{font-size:12px;color:var(--muted)}
+.ex-fields input{text-align:center;margin-top:3px;font:800 20px var(--display)}
+.timer-row{display:flex;align-items:center;gap:10px;margin-top:10px;flex-wrap:wrap}
+.timer{border:0;border-radius:12px;padding:10px 14px;background:var(--tide);color:#04202F;font:800 18px var(--display);min-width:130px}
+.timer.run{background:var(--bad);color:#fff}
+.holds{font-size:13px;color:var(--muted)}
+.ex-goal{font-size:13px;color:var(--gold);margin-top:8px}
+
+/* Goals */
+.goal-card .gc-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.gc-name{font:800 24px/1.1 var(--display)}
+.gc-metric{font-size:13px;color:var(--muted)}
+.edit{border:1px solid var(--line);background:none;border-radius:10px;padding:6px 12px;font-size:13px;color:var(--muted)}
+.gc-val{display:flex;align-items:baseline;gap:6px;margin:10px 0 8px}
+.gc-val .num{font-size:36px;font-weight:800;line-height:1}
+.gc-val .of{color:var(--muted)}
+.gc-val .pct{margin-left:auto;font:800 20px var(--display);color:var(--gold)}
+.gbar{position:relative;height:14px;border-radius:7px;background:var(--line)}
+.gbar span{position:absolute;inset:0 auto 0 0;border-radius:7px;background:var(--gold);transition:width .4s}
+.gbar .pace{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--text);opacity:.7}
+.gc-status{font-size:14px;margin-top:10px}
+.gc-status.ahead{color:var(--good)}.gc-status.behind{color:var(--ember)}.gc-status.done{color:var(--good);font-weight:600}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:8px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.no-target{font-size:14px;color:var(--muted);margin-top:4px}
+.no-target button{background:none;border:0;color:var(--tide);text-decoration:underline;padding:0;font-size:14px}
+
+/* Mini bar charts */
+.chart{position:relative;display:flex;align-items:flex-end;gap:5px;height:120px;margin-top:6px}
+.chart .col{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
+.chart .b{width:100%;border-radius:5px 5px 2px 2px;min-height:3px}
+.chart .v{font:600 11px var(--display);color:var(--muted);white-space:nowrap}
+.chart .tgt{position:absolute;left:-2px;right:-2px;height:2px;background:var(--text);opacity:.55}
+.chart .goal-line{position:absolute;left:0;right:0;border-top:2px dashed var(--gold);opacity:.8;pointer-events:none}
+.chart-x{display:flex;gap:5px;margin-top:6px}
+.chart-x span{flex:1;text-align:center;font-size:10px;color:var(--muted);white-space:nowrap;overflow:hidden}
+.chart-x span.today{color:var(--text);font-weight:600}
+.striped{background:repeating-linear-gradient(45deg,var(--c,var(--tide)) 0 5px,color-mix(in srgb,var(--c,var(--tide)) 45%,transparent) 5px 10px)}
+
+/* Fasting */
+.ring-wrap{position:relative;width:min(280px,78vw);margin:6px auto 4px;cursor:pointer;-webkit-user-select:none;user-select:none}
+.cring{width:100%;aspect-ratio:1;border-radius:50%;background:var(--line);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 17px),#000 calc(100% - 16px));
+          mask:radial-gradient(farthest-side,transparent calc(100% - 17px),#000 calc(100% - 16px))}
+.cring.done{animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{filter:brightness(1.18)}}
+.ring-text{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring-text .lbl{font-size:13px;color:var(--muted)}
+.remaining{font:800 52px/1 var(--display);font-variant-numeric:tabular-nums;transition:color .6s}
+.flip{display:inline-block;margin-top:6px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:3px 10px}
+.view-seg{display:flex;justify-content:center;gap:6px;margin:4px 0 12px}
+.view-seg button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:6px 14px;font-size:13px;font-weight:600;color:var(--muted)}
+.view-seg button.on{color:var(--text);border-color:var(--pc,var(--tide))}
+.stage{border-left:4px solid var(--pc,var(--tide))}
+.stage-top{display:flex;gap:12px;align-items:center}
+.stage-icon{font-size:30px;line-height:1}
+.stage-name{font:800 22px/1.1 var(--display)}
+.stage-fact{margin:12px 0 0;font-size:15px;min-height:44px}
+.stage-next{font-size:13px;color:var(--muted);margin-top:10px}
+.stage-dots{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin-top:12px}
+.stage-dots span{text-align:center;font-size:11px;color:var(--muted);padding:6px 2px;border-radius:8px;background:var(--panel2);line-height:1.2}
+.stage-dots span.past{opacity:.55}
+.stage-dots span.now{color:var(--text);outline:2px solid var(--pc,var(--tide))}
+.fact-btn{background:none;border:0;padding:0;margin-top:8px;color:var(--tide);font-size:13px;font-weight:600;text-decoration:underline}
+.grad-legend{display:inline-block;width:46px;height:10px;border-radius:3px;vertical-align:-1px;margin:0 6px;
+  background:linear-gradient(to right,hsl(0 80% var(--L)),hsl(30 80% var(--L)),hsl(60 80% var(--L)),hsl(95 80% var(--L)),hsl(125 80% var(--L)))}
+.hours{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin:4px 0 6px}
+.hours i{height:16px;border-radius:4px;background:var(--line)}
+.hours-cap{display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+.facts{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;gap:8px}
+.facts .num{font-size:22px;font-weight:800}
+.eat .num{font-size:30px;font-weight:800;color:var(--ember)}
+.fstats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.fstats div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 10px}
+.fstats .num{font-size:28px;font-weight:800;line-height:1;color:var(--tide)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.cal .h{font-size:11px;color:var(--muted);text-align:center}
+.cal .d{aspect-ratio:1;border-radius:8px;display:grid;place-items:center;font:600 13px var(--display);background:var(--panel2);color:var(--muted)}
+.cal .s1,.cal .s2{color:#141414}
+.cal .fut{background:none;border:1px dashed var(--line)}
+.cal .today{outline:2px solid var(--gold);outline-offset:1px}
+
+/* Trends + badges */
+.totals{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.totals div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px}
+.totals .num{font-size:30px;font-weight:800;line-height:1}
+.sheet-link{display:block;text-align:center;color:var(--tide);font-weight:600;margin:14px 0}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.badge{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 8px;text-align:center}
+.badge .e{font-size:32px;line-height:1.1}
+.badge .n{font-weight:600;font-size:14px;margin-top:6px}
+.badge .d{font-size:11px;color:var(--muted);margin-top:3px}
+.badge.locked .e{filter:grayscale(1);opacity:.3}
+.badge.locked .n{color:var(--muted)}
+.badge.got{border-color:var(--gold)}
+
+/* Nav */
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--panel);border-top:1px solid var(--line);
+  display:grid;grid-template-columns:repeat(5,1fr);padding:6px 6px calc(6px + env(safe-area-inset-bottom));z-index:5}
+nav button{background:none;border:0;padding:6px 0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--muted);font-size:11px;font-weight:600}
+nav button .i{font-size:22px;line-height:1;filter:grayscale(.6)}
+nav button.on{color:var(--text)}
+nav button.on .i{filter:none}
+
+/* Feedback */
+#toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-140%);background:var(--panel2);border:1px solid var(--line);
+  padding:12px 18px;border-radius:14px;font-weight:600;z-index:40;transition:transform .3s;max-width:90vw;text-align:center}
+#toast.show{transform:translate(-50%,0)}
+#toast.err{border-color:var(--bad);color:var(--bad)}
+#celebrate{position:fixed;inset:0;display:none;place-content:center;text-align:center;z-index:30;background:rgba(8,10,22,.82)}
+#celebrate.show{display:grid}
+#celebrate .big{font-size:84px;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
+#celebrate .t{font:800 40px/1 var(--display);color:var(--gold);margin-top:10px}
+#celebrate .s{color:#C9CFE6;margin-top:8px}
+@keyframes pop{from{transform:scale(.2);opacity:0}to{transform:scale(1);opacity:1}}
+.loading{display:grid;place-items:center;height:60vh;color:var(--muted);text-align:center;padding:0 20px}
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--panel);color:var(--text);width:min(440px,94vw);padding:20px;max-height:90vh}
+dialog::backdrop{background:rgba(0,0,0,.6)}
+.tri{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.tri label{font-size:12px;color:var(--muted)}
+.tri input{margin-top:3px;text-align:center;font:800 20px var(--display)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:18px}
+.row2 button{border-radius:12px;padding:12px;border:1px solid var(--line);background:var(--panel2);font-weight:600}
+.row2 .go{background:var(--ember);color:#1A1205;border:0}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="brand">Fit<b>Quest</b></div>
+    <span class="sync" id="sync" hidden>Syncing…</span>
+    <button class="icon-btn" id="openSettings" aria-label="Weekly goals">⚙️</button>
+  </div>
+
+  <div id="loading" class="loading">Loading your stats…</div>
+
+  <div id="connect" class="card connect" hidden>
+    <h2 style="margin-top:0">Connect FitQuest</h2>
+    <p>Paste the two values from your Apps Script setup. They're stored only on this phone.</p>
+    <label class="f">API link (ends in /exec)</label>
+    <input type="text" id="cUrl" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://script.google.com/macros/s/…/exec">
+    <label class="f">API token</label>
+    <input type="text" id="cToken" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Long code from the Execution log">
+    <button class="primary" id="cGo">Connect</button>
+  </div>
+
+  <!-- HOME (Scoreboard) -->
+  <section class="tab" id="tab-home">
+    <div class="greet"><div class="greet-hi" id="greetHi">Hello, champ</div><div class="greet-sub" id="greetSub"></div></div>
+
+    <div class="sb-hero">
+      <div class="sb-top">
+        <div><div class="sb-rank" id="rank">Level 1, Rookie</div><div class="sb-xp num"><span id="xpTotal">0</span> <small>XP</small></div></div>
+        <div class="sb-badge num" id="lvl" aria-label="Level">1</div>
+      </div>
+      <div class="sb-meter" id="meter"></div>
+      <div class="sb-next" id="xpInto"></div>
+    </div>
+
+    <div class="card" id="bdayCard" hidden></div>
+
+    <div class="sb-tiles">
+      <button class="sb-tile t-red" data-go="stats"><div class="n num" id="tStreak">0</div><div class="l">🔥 day streak</div><div class="s" id="tStreakSub"></div></button>
+      <button class="sb-tile t-fast" id="tFastTile" data-go="fast"><div class="n num" id="tFast">Ready</div><div class="l" id="tFastLbl">⏱️ no fast running</div><div class="s" id="tFastSub"></div></button>
+      <button class="sb-tile t-gold" data-go="workout"><div class="n num" id="tWork">0/4</div><div class="l">💪 workouts this week</div><div class="s" id="tWorkSub"></div></button>
+      <button class="sb-tile t-green" id="tChalTile"><div class="n num" id="tChal">0%</div><div class="l">⚔️ weekly challenge</div><div class="s" id="tChalSub"></div></button>
+    </div>
+
+    <div class="sb-acts">
+      <button class="sb-act a-ember" data-go="workout">＋ Log workout</button>
+      <button class="sb-act a-tide" data-go="fast" id="actFast">▶ Start a fast</button>
+    </div>
+
+    <div class="card" id="homeGoals"></div>
+
+    <div class="card challenge" id="chCard">
+      <h3 id="chHead">Weekly challenge</h3>
+      <div class="txt" id="chText"></div>
+      <div class="bar"><span id="chBar"></span></div>
+      <div class="xp-line"><span id="chProg"></span><span id="chXp"></span></div>
+    </div>
+
+    <div class="card">
+      <h3>Recent</h3>
+      <ul class="list sb-recent" id="recent"></ul>
+    </div>
+  </section>
+
+  <!-- WORKOUT -->
+  <section class="tab" id="tab-workout">
+    <h2>Log a workout</h2>
+    <div class="seg" id="modeSeg">
+      <button data-v="Quick" class="on">Quick</button>
+      <button data-v="Detailed">Detailed</button>
+    </div>
+
+    <label class="f">Type</label>
+    <div class="chips" id="typeChips"></div>
+
+    <div id="detailed" hidden>
+      <label class="f">Quick add</label>
+      <div class="lib">
+        <div class="cats" id="libSeg"></div>
+        <div class="chips" id="libChips"></div>
+      </div>
+      <div id="exList"></div>
+      <button class="ghost" id="addEx">+ Add another exercise</button>
+    </div>
+
+    <label class="f">Total minutes</label>
+    <div class="stepper">
+      <button data-step="-5" aria-label="Minus 5 minutes">−</button>
+      <input id="dur" type="number" inputmode="numeric" min="1" value="30">
+      <button data-step="5" aria-label="Plus 5 minutes">+</button>
+    </div>
+    <div class="chips" style="margin-top:8px" id="durChips"></div>
+
+    <label class="f">Intensity</label>
+    <div class="chips" id="intChips"></div>
+
+    <label class="f">Date</label>
+    <input type="date" id="wDate">
+    <label class="f">Notes</label>
+    <textarea id="wNotes" rows="2" placeholder="How did it feel?"></textarea>
+
+    <button class="primary" id="logW">Log workout <span class="pill" id="xpPrev"></span></button>
+  </section>
+
+  <!-- FAST -->
+  <section class="tab fast-tab" id="tab-fast">
+    <h2>Fasting</h2>
+    <div id="fastIdle">
+      <div class="card eat" id="eatCard"></div>
+      <label class="f">Target</label>
+      <div class="chips" id="targetChips"></div>
+      <label class="f">Or set your own (hours)</label>
+      <input type="number" id="customT" inputmode="decimal" min="1" max="48" placeholder="e.g. 15">
+      <details><summary>Started earlier?</summary><input type="datetime-local" id="fStart"></details>
+      <button class="primary tide" id="startF">Start fast</button>
+      <p class="small muted" style="margin-top:12px">You earn XP for hitting the target you set, not for fasting longer.</p>
+    </div>
+
+    <div id="fastActive" hidden>
+      <div class="ring-wrap" id="ringWrap" role="button" aria-label="Switch between time remaining and time elapsed">
+        <div class="cring" id="cring"></div>
+        <div class="ring-text"><div class="lbl" id="remLbl">Time remaining</div><div class="remaining" id="remaining">0:00:00</div><div class="lbl" id="elapsedLbl"></div><div><span class="flip" id="flipHint">Tap for elapsed</span></div></div>
+      </div>
+      <div class="view-seg" id="viewSeg"><button data-v="remaining">Remaining</button><button data-v="elapsed">Elapsed</button></div>
+      <div class="card stage" id="stageCard"></div>
+      <div class="card">
+        <div class="hours" id="hourBlocks"></div>
+        <div class="hours-cap"><span id="hourNow"></span><span id="hourPct"></span></div>
+      </div>
+      <div class="card facts">
+        <div><div class="small muted">Started</div><div class="num" id="fStarted"></div></div>
+        <div><div class="small muted">Target</div><div class="num" id="fTarget"></div></div>
+        <div><div class="small muted">Done at</div><div class="num" id="fDoneAt"></div></div>
+      </div>
+      <details><summary>Ended at a different time?</summary><input type="datetime-local" id="fEnd"></details>
+      <label class="f">Notes</label>
+      <textarea id="fNotes" rows="2" placeholder="Optional"></textarea>
+      <button class="primary tide" id="endF">End fast</button>
+      <button class="link" id="cancelF">Cancel this fast</button>
+    </div>
+
+    <div id="fastGoals"></div>
+    <div class="sec-title">Your fasting log</div>
+    <div class="fstats">
+      <div><div class="num" id="fAvg7">0</div><div class="small muted">avg hours, last 7 days</div></div>
+      <div><div class="num" id="fRate">0%</div><div class="small muted">fasts on target, 30 days</div></div>
+      <div><div class="num" id="fDays">0</div><div class="small muted">days fasted, last 30</div></div>
+    </div>
+    <div class="card">
+      <h3>Hours fasted per day, last 14 days</h3>
+      <div class="chart" id="fChart"></div>
+      <div class="chart-x" id="fChartX"></div>
+      <div class="legend"><span>Far from target<i class="grad-legend"></i>Target met</span><span><i class="striped"></i>In progress</span><span><i style="background:var(--text);opacity:.55;height:2px"></i>Target</span></div>
+    </div>
+    <div class="card">
+      <h3 id="calLabel">Fasting calendar</h3>
+      <div class="cal" id="cal"></div>
+      <div class="legend"><span>Far from target<i class="grad-legend"></i>Target met</span><span><i style="background:var(--panel2)"></i>No fast</span></div>
+    </div>
+  </section>
+
+  <!-- GOALS -->
+  <section class="tab" id="tab-goals">
+    <div class="title-row"><h2>Exercise goals</h2><button class="chip on" id="addGoal">+ New goal</button></div>
+    <div class="seg" id="periodSeg">
+      <button data-p="W" class="on">Week</button><button data-p="M">Month</button><button data-p="Y">🎂 Year</button>
+    </div>
+    <p class="small muted" id="periodInfo"></p>
+    <div id="goalList"></div>
+  </section>
+
+  <!-- STATS -->
+  <section class="tab" id="tab-stats">
+    <div class="seg" id="statsSeg" style="margin-bottom:14px">
+      <button data-v="trends" class="on">Trends</button><button data-v="badges">Badges <span id="badgeCount"></span></button>
+    </div>
+    <div id="statsTrends">
+      <div class="totals" style="margin-bottom:12px">
+        <div><div class="num" id="tW">0</div><div class="small muted">workouts</div></div>
+        <div><div class="num" id="tF">0</div><div class="small muted">fasts on target</div></div>
+        <div><div class="num" id="tL">0</div><div class="small muted">longest active streak</div></div>
+        <div><div class="num" id="tC">0</div><div class="small muted">challenges won</div></div>
+      </div>
+      <div id="charts"></div>
+      <a class="sheet-link" id="sheetLink" target="_blank" rel="noopener">Open the Google Sheet</a>
+    </div>
+    <div id="statsBadges" hidden><div class="badges" id="badges"></div></div>
+  </section>
+</div>
+
+<nav id="nav">
+  <button data-tab="home" class="on"><span class="i">🏠</span>Home</button>
+  <button data-tab="workout"><span class="i">💪</span>Workout</button>
+  <button data-tab="fast"><span class="i">⏱️</span>Fast</button>
+  <button data-tab="goals"><span class="i">🎯</span>Goals</button>
+  <button data-tab="stats"><span class="i">📈</span>Stats</button>
+</nav>
+
+<datalist id="exNames"></datalist>
+<div id="toast" role="status"></div>
+<div id="celebrate"><div><div class="big" id="celIcon"></div><div class="t" id="celTitle"></div><div class="s" id="celSub"></div><div class="s small" style="margin-top:22px">Tap to continue</div></div></div>
+
+<dialog id="settings">
+  <h2 style="margin-top:0">Goals and settings</h2>
+  <label class="f">Workouts per week</label><input type="number" id="setW" min="1" max="14">
+  <label class="f">Fasts on target per week</label><input type="number" id="setF" min="1" max="7">
+  <label class="f">Default fasting target (hours)</label><input type="number" id="setD" min="1" max="48">
+  <label class="f">Your birthday</label>
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px"><select id="setBM" aria-label="Birthday month"></select><select id="setBD" aria-label="Birthday day"></select></div>
+  <p class="small muted" style="margin:6px 0 0">Monthly goals run from this day each month, and yearly goals run birthday to birthday.</p>
+  <div class="row2"><button id="closeSet">Close</button><button class="go" id="saveSet">Save goals</button></div>
+  <div class="conn-line" id="connLine"></div>
+</dialog>
+
+<dialog id="quickLog">
+  <h2 style="margin:0 0 4px">Log progress</h2>
+  <p class="small muted" style="margin:0 0 12px" id="qlSub"></p>
+  <div id="qlBody"></div>
+  <label class="f" style="margin-top:6px">Date</label>
+  <input type="date" id="qlDate">
+  <p class="small muted">Counts toward your goals and daily streak. Log a full session from the Workout tab.</p>
+  <div class="row2"><button id="qlCancel">Cancel</button><button class="go" id="qlSave">Log it</button></div>
+</dialog>
+
+<dialog id="goalDlg">
+  <h2 style="margin-top:0" id="gdTitle">New goal</h2>
+  <label class="f" id="gdExLabel">Exercise</label>
+  <select id="gdPick" aria-label="Exercise"></select>
+  <input type="text" id="gdEx" class="ex-other" placeholder="Type the exercise name" hidden>
+  <label class="f">How you do it</label>
+  <div class="seg" id="gdKind"><button data-k="reps" class="on">Reps</button><button data-k="time">Timed hold</button><button data-k="cardio">Duration</button><button data-k="fast">Fasting</button></div>
+  <label class="f">What to measure</label>
+  <div class="chips" id="gdMetric"></div>
+  <p class="small muted" id="gdHint"></p>
+  <label class="f" id="gdUnit">Targets</label>
+  <div class="tri">
+    <label>Per week<input type="number" id="gdW" inputmode="decimal" min="0"></label>
+    <label><span id="gdMLbl">Per month</span><input type="number" id="gdM" inputmode="decimal" min="0"></label>
+    <label><span id="gdYLbl">Per birthday year</span><input type="number" id="gdY" inputmode="decimal" min="0"></label>
+  </div>
+  <button class="ghost" style="margin-top:10px" id="gdFill">Fill month and year from the weekly target</button>
+  <div class="row2"><button id="gdCancel">Cancel</button><button class="go" id="gdSave">Save goal</button></div>
+  <button class="link" id="gdDelete" hidden>Delete this goal</button>
+</dialog>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const TYPES = ['Strength','Cardio','HIIT','Run','Walk','Cycling','Yoga / Mobility','Sports','Other'];
+const INTENSITY = ['Easy','Moderate','Hard'];
+const DUR = [15,30,45,60,90];
+const TARGETS = [{h:12,l:'12h'},{h:14,l:'14h'},{h:16,l:'16:8'},{h:18,l:'18:6'},{h:20,l:'20:4'},{h:23,l:'OMAD'}];
+const LIB = {
+  'Legs': [['Squat','reps'],['Front squat','reps'],['Goblet squat','reps'],['Leg press','reps'],['Hack squat','reps'],['Deadlift','reps'],['Romanian deadlift','reps'],['Lunge','reps'],['Walking lunge','reps'],['Bulgarian split squat','reps'],['Step-up','reps'],['Leg extension','reps'],['Leg curl','reps'],['Hip thrust','reps'],['Glute bridge','reps'],['Calf raise','reps'],['Wall sit','time']],
+  'Chest': [['Bench press','reps'],['Incline bench press','reps'],['Dumbbell bench press','reps'],['Incline dumbbell press','reps'],['Machine chest press','reps'],['Chest fly','reps'],['Cable crossover','reps'],['Chest dip','reps'],['Push-up','reps']],
+  'Back': [['Pull-up','reps'],['Chin-up','reps'],['Lat pulldown','reps'],['Seated cable row','reps'],['Barbell row','reps'],['Dumbbell row','reps'],['T-bar row','reps'],['Face pull','reps'],['Back extension','reps'],['Dead hang','time']],
+  'Shoulders': [['Overhead press','reps'],['Dumbbell shoulder press','reps'],['Arnold press','reps'],['Lateral raise','reps'],['Front raise','reps'],['Rear delt fly','reps'],['Upright row','reps'],['Shrug','reps']],
+  'Arms': [['Bicep curl','reps'],['Barbell curl','reps'],['Hammer curl','reps'],['Preacher curl','reps'],['Tricep pushdown','reps'],['Skull crusher','reps'],['Overhead tricep extension','reps'],['Close-grip bench press','reps'],['Tricep dip','reps']],
+  'Core': [['Plank','time'],['Side plank','time'],['Hollow hold','time'],['Crunch','reps'],['Cable crunch','reps'],['Sit-up','reps'],['Hanging leg raise','reps'],['Russian twist','reps'],['Bicycle crunch','reps'],['Mountain climber','reps'],['Dead bug','reps'],['Ab wheel rollout','reps']],
+  'HIIT moves': [['Burpee','reps'],['Jump squat','reps'],['Jumping jack','reps'],['High knees','time'],['Mountain climber','reps'],['Box jump','reps'],['Kettlebell swing','reps'],['Thruster','reps'],['Wall ball','reps'],['Battle ropes','time'],['Skater jump','reps'],['Sprint interval','cardio'],['Tabata round','cardio']],
+  'Running': [['Outdoor run','cardio'],['Treadmill run','cardio'],['Trail run','cardio'],['Interval run','cardio'],['Tempo run','cardio'],['Long run','cardio']],
+  'Walking': [['Outdoor walk','cardio'],['Treadmill walk','cardio'],['Incline walk','cardio'],['Hike','cardio'],['Rucking','cardio']],
+  'Cycling': [['Outdoor ride','cardio'],['Stationary bike','cardio'],['Spin class','cardio'],['Mountain bike','cardio']],
+  'Cardio machines': [['Elliptical','cardio'],['Rowing machine','cardio'],['Stair climber','cardio'],['Assault bike','cardio'],['Jump rope','cardio'],['Swimming','cardio'],['Ski erg','cardio']],
+  'Yoga & mobility': [['Yoga flow','cardio'],['Stretching','cardio'],['Foam rolling','cardio'],['Sun salutation','reps'],['Cat-cow','reps'],['World’s greatest stretch','reps'],['Downward dog','time'],['Pigeon pose','time'],['Child’s pose','time'],['Warrior pose','time'],['Deep squat hold','time']],
+  'Sports': [['Basketball','cardio'],['Soccer','cardio'],['Tennis','cardio'],['Badminton','cardio'],['Pickleball','cardio'],['Cricket','cardio'],['Volleyball','cardio'],['Golf','cardio'],['Swimming','cardio']],
+};
+// Which exercise groups show for each workout type
+const TYPE_GROUPS = {
+  'Strength': ['Legs','Chest','Back','Shoulders','Arms','Core'],
+  'HIIT': ['HIIT moves','Core','Legs'],
+  'Cardio': ['Cardio machines','Running','Cycling'],
+  'Run': ['Running'],
+  'Walk': ['Walking'],
+  'Cycling': ['Cycling'],
+  'Yoga / Mobility': ['Yoga & mobility','Core'],
+  'Sports': ['Sports'],
+};
+const groupsFor = type => TYPE_GROUPS[type] || Object.keys(LIB);
+const METRIC_INFO = {
+  reps: [['Reps','Total reps','Sets × reps across every workout'],['Sets','Sets','Number of sets'],['Volume','Volume','Sets × reps × weight'],['Sessions','Days trained','Days you did this exercise'],['Best','Heaviest weight','Your heaviest weight in the period']],
+  time: [['Time','Total time','All holds added together (enter minutes)'],['Sets','Holds','Number of holds'],['Sessions','Days trained','Days you did this exercise'],['Best','Longest hold','Your longest single hold (enter seconds)']],
+  cardio: [['Time','Total time','All sessions added together (enter minutes)'],['Distance','Distance','Total distance (use the same unit you log in)'],['Sessions','Days done','Days you did this activity'],['Best','Longest distance','Your longest single session distance']],
+};
+METRIC_INFO.fast = [['Hours','Hours fasted','Total hours from fasts you complete in the app'],['OnTarget','Fasts on target','Fasts that reach the target you set'],['Fasts','Fasts completed','Every completed fast of 1 hour or more'],['Sessions','Days fasted','Days with at least one completed fast']];
+const isFastGoal = g => g.kind === 'fast';
+const looksLikeFasting = g => g.kind !== 'fast' && /fast/i.test(g.exercise);
+const KIND_LABEL = { reps:'Reps', time:'⏱ Timed', cardio:'🏃 Duration' };
+const NEXT_KIND = { reps:'time', time:'cardio', cardio:'reps' };
+const S = { mode:'Quick', type:'Strength', intensity:'Moderate', target:16, lib:'Legs', period:'W' };
+let D = null, lastLevel = null, tick = null, celebrations = [], EX = [], exSeq = 0, editingGoal = null;
+
+/* ---------- Helpers ---------- */
+/* ---------- API connection (Apps Script JSON API) ---------- */
+const CFG_KEY = 'fq-api-v1', QUEUE_KEY = 'fq-queue-v1';
+const QUEUEABLE = { logWorkout:1, logExercise:1, startFast:1, endFast:1, cancelFast:1 };
+function cfg(){ try { return JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); } catch(e){ return null; } }
+function setCfg(c){ try { c ? localStorage.setItem(CFG_KEY, JSON.stringify(c)) : localStorage.removeItem(CFG_KEY); } catch(e){} }
+class NetError extends Error {}
+async function apiFetch(fn, args, c){
+  c = c || cfg();
+  if (!c) throw new Error('Not connected yet.');
+  let res;
+  try {
+    res = await fetch(c.url, { method:'POST', redirect:'follow', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ token: c.token, action: fn, args }) });
+  } catch(e) { throw new NetError('You’re offline.'); }
+  let j;
+  try { j = await res.json(); } catch(e) { throw new Error('Unexpected reply. Check that the API link ends in /exec and the deployment has access set to Anyone.'); }
+  if (!j.ok) throw new Error(j.error || 'Something went wrong.');
+  return j.data;
+}
+function call(fn, ...args){ return apiFetch(fn, args); }
+
+/* Offline queue: logs made without signal are kept and sent in order later */
+function queue(){ try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch(e){ return []; } }
+function setQueue(q){ try { localStorage.setItem(QUEUE_KEY, JSON.stringify(q)); } catch(e){} showQueue(); }
+function showQueue(){ const n = queue().length, el = $('#sync'); if (n) { el.hidden = false; el.textContent = `${n} waiting to sync`; } else if (!syncing) el.hidden = true; }
+function enqueue(fn, args){
+  const now = new Date().toISOString();
+  if (fn === 'startFast' && !args[1]) args[1] = now;   // keep the real start time
+  if (fn === 'endFast' && !args[0]) args[0] = now;     // keep the real end time
+  const q = queue(); q.push({ fn, args }); setQueue(q);
+  // Optimistic update so the screen matches what you just did
+  if (D) {
+    if (fn === 'startFast') D.activeFast = { startIso: args[1], target: Number(args[0]) || D.settings.defaultFast };
+    if (fn === 'endFast' || fn === 'cancelFast') D.activeFast = null;
+    render(D);
+  }
+}
+let flushing = false;
+async function flushQueue(){
+  if (flushing) return; flushing = true;
+  let last = null;
+  try {
+    let q = queue();
+    while (q.length) {
+      const item = q[0];
+      try { last = await apiFetch(item.fn, item.args); }
+      catch(e) { if (e instanceof NetError) break; toast(`Couldn’t sync a saved ${item.fn.replace(/([A-Z])/g,' $1').toLowerCase()}: ${e.message}`, true); }
+      q = queue(); q.shift(); setQueue(q);
+    }
+  } finally { flushing = false; }
+  if (last && last.dashboard) render(last.dashboard);
+}
+window.addEventListener('online', () => flushQueue().then(refresh));
+function act(btn, fn, ...args){
+  if (btn) btn.disabled = true;
+  return call(fn, ...args)
+    .then(r => { toast(r.message); render(r.dashboard); buzz(); return r; })
+    .catch(e => {
+      if (e instanceof NetError && QUEUEABLE[fn]) { enqueue(fn, args); toast('Saved on your phone. It’ll sync when you’re back online.'); buzz(); return { queued: true }; }
+      toast((e && e.message) || String(e), true); return null;
+    })
+    .finally(() => { if (btn) btn.disabled = false; });
+}
+function toast(msg, err){
+  const t = $('#toast'); t.textContent = msg; t.className = 'show' + (err ? ' err' : '');
+  clearTimeout(t._h); t._h = setTimeout(() => t.className = err ? 'err' : '', 2800);
+}
+function buzz(p){ try { navigator.vibrate && navigator.vibrate(p || 30); } catch(e){} }
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const todayStr = () => { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); };
+const localIso = v => v ? new Date(v).toISOString() : '';
+const hm = d => d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+const clock = ms => { const s = Math.max(0, Math.floor(ms/1000)); return `${Math.floor(s/3600)}:${pad(Math.floor(s/60)%60)}:${pad(s%60)}`; };
+const dur = ms => { const m = Math.max(0, Math.round(ms/60000)); return m >= 60 ? `${Math.floor(m/60)}h ${pad(m%60)}m` : `${m}m`; };
+const mmss = sec => { sec = Math.round(sec); const h = Math.floor(sec/3600), m = Math.floor(sec/60)%60, s = sec%60; return h ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`; };
+const kindOf = name => {
+  const n = String(name||'').trim().toLowerCase(); if (!n) return null;
+  for (const g in LIB) for (const [x,k] of LIB[g]) if (x.toLowerCase() === n) return k;
+  const h = D && D.exerciseHistory.find(x => x.name.toLowerCase() === n);
+  return h ? h.kind : (/plank|hold|hang|wall sit|pose/.test(n) ? 'time' : /run|walk|ride|bike|swim|row|hike|jog/.test(n) ? 'cardio' : null);
+};
+const metricLabel = (m, k) => ((METRIC_INFO[k] || []).find(x => x[0] === m) || [m,m])[1];
+function fmtVal(m, k, v){
+  if (m === 'Time' || (m === 'Best' && k === 'time')) return mmss(v);
+  return (Math.round(v*10)/10).toLocaleString();
+}
+const unitWord = (m, k) => ({Reps:'reps', Sets: k === 'time' ? 'holds' : 'sets', Sessions:'days', Volume:'', Distance:'', Hours:'hours', Fasts:'fasts', OnTarget:'fasts'})[m] || '';
+
+/* ---------- Tabs ---------- */
+function showTab(name){
+  $$('.tab').forEach(t => t.classList.toggle('on', t.id === 'tab-' + name));
+  $$('#nav button').forEach(b => b.classList.toggle('on', b.dataset.tab === name));
+  window.scrollTo(0,0);
+}
+$('#nav').addEventListener('click', e => { const b = e.target.closest('button'); if (b) showTab(b.dataset.tab); });
+function seg(el, attr, onPick){
+  el.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
+    onPick(b.dataset[attr]);
+  };
+}
+function chips(el, items, key, getLabel, getVal, onPick){
+  el.innerHTML = items.map(i => `<button class="chip${String(getVal(i)) === String(S[key]) ? ' on' : ''}" data-v="${esc(getVal(i))}">${esc(getLabel(i))}</button>`).join('');
+  el.onclick = e => {
+    const b = e.target.closest('.chip'); if (!b) return;
+    S[key] = isNaN(b.dataset.v) ? b.dataset.v : Number(b.dataset.v);
+    el.querySelectorAll('.chip').forEach(c => c.classList.toggle('on', c === b));
+    onPick && onPick();
+  };
+}
+
+/* ---------- Workout: mode, library, exercise rows ---------- */
+seg($('#modeSeg'), 'v', v => {
+  S.mode = v; $('#detailed').hidden = v !== 'Detailed';
+  if (v === 'Detailed' && !EX.length) addRow();
+  xpPreview();
+});
+const libKind = name => { const n = String(name||'').trim().toLowerCase(); for (const g in LIB) for (const [x,k] of LIB[g]) if (x.toLowerCase() === n) return k; return null; };
+
+// Dropdown of every exercise, grouped by muscle group, plus your own custom ones
+function exerciseOptions(selected, type){
+  const sel = String(selected||'').trim().toLowerCase();
+  let found = false;
+  const opt = (n, k) => { const on = n.toLowerCase() === sel && !found; if (on) found = true;
+    return `<option value="${esc(n)}" data-k="${k}"${on ? ' selected' : ''}>${esc(n)}${k === 'time' ? ' (timed)' : ''}</option>`; };
+  const mine = (D ? D.exerciseHistory : []).filter(x => !libKind(x.name));
+  let html = `<option value="" disabled${sel ? '' : ' selected'}>Choose an exercise…</option>`;
+  if (mine.length) html += `<optgroup label="Your exercises">${mine.map(x => opt(x.name, x.kind)).join('')}</optgroup>`;
+  const groups = type === 'All' ? Object.keys(LIB) : groupsFor(type || S.type);
+  groups.forEach(g => html += `<optgroup label="${g}">${LIB[g].map(([n,k]) => opt(n, k)).join('')}</optgroup>`);
+  // Keep a picked exercise from another type visible instead of treating it as custom
+  if (sel && !found) for (const g in LIB) { const hit = LIB[g].find(([n]) => n.toLowerCase() === sel); if (hit) { html += `<optgroup label="${g}">${opt(hit[0], hit[1])}</optgroup>`; break; } }
+  html += `<option value="__other"${sel && !found ? ' selected' : ''}>Other, type it…</option>`;
+  return { html, custom: !!sel && !found };
+}
+function bindPicker(pick, other, onName){
+  pick.onchange = () => {
+    if (pick.value === '__other') { other.hidden = false; other.value = ''; other.focus(); onName('', null); }
+    else { other.hidden = true; onName(pick.value, pick.selectedOptions[0].dataset.k || null); }
+  };
+  other.oninput = () => onName(other.value, kindOf(other.value));
+}
+
+function renderLib(){
+  const groups = [];
+  if (D && D.exerciseHistory.length) groups.push('Recent');
+  groups.push(...groupsFor(S.type));
+  if (!groups.includes(S.lib)) S.lib = groupsFor(S.type)[0];
+  $('#libSeg').innerHTML = groups.map(g => `<button class="chip sm${g === S.lib ? ' on' : ''}" data-g="${g}">${g}</button>`).join('');
+  renderLibChips();
+}
+$('#libSeg').onclick = e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  S.lib = b.dataset.g;
+  $$('#libSeg .chip').forEach(c => c.classList.toggle('on', c === b));
+  renderLibChips();
+};
+function renderLibChips(){
+  const items = S.lib === 'Recent' ? D.exerciseHistory.slice(0, 18).map(x => [x.name, x.kind]) : LIB[S.lib];
+  $('#libChips').innerHTML = items.map(([n,k]) =>
+    `<button class="chip sm" data-n="${esc(n)}" data-k="${k}">+ ${esc(n)}${k === 'time' ? '<span class="tm">⏱</span>' : k === 'cardio' ? '<span class="tm">🏃</span>' : ''}</button>`).join('');
+}
+$('#libChips').onclick = e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  const name = b.dataset.n, kind = b.dataset.k;
+  const existing = EX.find(r => r.name.toLowerCase() === name.toLowerCase());
+  if (existing) { existing.el.classList.remove('flash'); void existing.el.offsetWidth; existing.el.classList.add('flash'); existing.el.scrollIntoView({block:'center', behavior:'smooth'}); return; }
+  const blank = EX.find(r => !r.name.trim());
+  if (blank) setRowName(blank, name, kind); else addRow({ name, kind });
+  buzz(15); xpPreview();
+};
+
+function setRowName(r, name, kind){
+  r.name = name;
+  const o = exerciseOptions(name);
+  r.el.querySelector('.ex-pick').innerHTML = o.html;
+  const other = r.el.querySelector('.ex-other');
+  other.hidden = !o.custom; other.value = o.custom ? name : '';
+  if (kind && kind !== r.kind) { r.kind = kind; r.manualKind = false; renderRowBody(r); } else rowGoalHint(r);
+}
+
+function makeRow(v, fixed){
+  v = v || {};
+  const r = { id: ++exSeq, name: v.name || '', kind: v.kind || 'reps', sets: v.sets || '', reps: '', weight: '', seconds: '', minutes: '', distance: '', holds: [], manualKind: !!fixed };
+  const o = exerciseOptions(r.name);
+  r.el = document.createElement('div');
+  r.el.className = 'ex-card';
+  r.el.innerHTML = fixed
+    ? `<div class="ex-top"><div class="gc-name" style="font-size:22px">${esc(r.name)}</div><span></span><button class="kind" type="button" hidden></button></div>
+       <div class="body"></div><div class="ex-goal"></div>`
+    : `<div class="ex-top">
+      <select class="ex-pick" aria-label="Exercise">${o.html}</select>
+      <button class="kind" type="button"></button>
+      <button class="rm" type="button" aria-label="Remove exercise">×</button>
+    </div>
+    <input class="ex-other" type="text" placeholder="Type the exercise name" value="${o.custom ? esc(r.name) : ''}" ${o.custom ? '' : 'hidden'}>
+    <div class="body"></div><div class="ex-goal"></div>`;
+  if (!fixed) {
+    bindPicker(r.el.querySelector('.ex-pick'), r.el.querySelector('.ex-other'), (name, kind) => {
+      r.name = name;
+      if (kind && !r.manualKind && kind !== r.kind) { r.kind = kind; renderRowBody(r); } else rowGoalHint(r);
+      xpPreview();
+    });
+    r.el.querySelector('.kind').onclick = () => { r.kind = NEXT_KIND[r.kind]; r.manualKind = true; r.holds = []; renderRowBody(r); };
+    r.el.querySelector('.rm').onclick = () => { stopTimer(r); r.el.remove(); EX = EX.filter(x => x !== r); xpPreview(); };
+  }
+  return r;
+}
+function addRow(v){
+  const r = makeRow(v);
+  EX.push(r);
+  $('#exList').appendChild(r.el);
+  renderRowBody(r);
+}
+
+/* ---------- Quick log from a goal ---------- */
+let QL = null;
+function openQuickLog(g){
+  QL = { goal: g, row: makeRow({ name: g.exercise, kind: g.kind }, true) };
+  $('#qlBody').innerHTML = ''; $('#qlBody').appendChild(QL.row.el); renderRowBody(QL.row);
+  $('#qlDate').value = todayStr();
+  const p = g.periods.W || g.periods.M || g.periods.Y;
+  const word = g.periods.W ? 'this week' : g.periods.M ? 'this month' : 'this year';
+  $('#qlSub').textContent = p ? `${metricLabel(g.metric, g.kind)} ${word}: ${fmtVal(g.metric, g.kind, p.value)} of ${fmtVal(g.metric, g.kind, p.target)} ${unitWord(g.metric, g.kind)}` : '';
+  $('#quickLog').showModal();
+  const first = QL.row.el.querySelector('input'); if (first && g.kind !== 'time') first.focus();
+}
+function closeQuickLog(){ if (QL) stopTimer(QL.row); $('#quickLog').close(); }
+$('#qlCancel').onclick = closeQuickLog;
+$('#quickLog').addEventListener('cancel', () => QL && stopTimer(QL.row));
+$('#qlSave').onclick = e => {
+  const r = QL.row, g = QL.goal;
+  if (r.timerStart) { toast('Stop the running timer first.', true); return; }
+  const before = {}; ['W','M','Y'].forEach(k => { if (g.periods[k]) before[k] = g.periods[k].value; });
+  act(e.currentTarget, 'logExercise',
+    { name: r.name, kind: r.kind, sets: r.sets, reps: r.reps, weight: r.weight, seconds: r.seconds, minutes: r.minutes, distance: r.distance, holds: r.holds },
+    $('#qlDate').value
+  ).then(res => {
+    if (!res) return;
+    closeQuickLog();
+    if (!res.dashboard) return;
+    const now = res.dashboard.goals.find(x => x.id === g.id);
+    if (now) ['W','M','Y'].forEach(k => {
+      const p = now.periods[k];
+      if (p && before[k] < p.target && p.value >= p.target)
+        celebrations.push({ icon:'🎯', title:`${{W:'Weekly',M:'Monthly',Y:'Yearly'}[k]} goal met`, sub:`${g.exercise}: ${fmtVal(g.metric,g.kind,p.value)} ${unitWord(g.metric,g.kind)}. +${D.goalXp[k]} XP` });
+    });
+    nextCelebration();
+  });
+};
+
+function renderRowBody(r){
+  stopTimer(r);
+  const timed = r.kind === 'time', cardio = r.kind === 'cardio';
+  r.el.classList.toggle('timed', timed);
+  r.el.classList.toggle('cardio', cardio);
+  r.el.querySelector('.kind').textContent = KIND_LABEL[r.kind];
+  const body = r.el.querySelector('.body');
+  const field = (f, label, ph, mode) => `<label>${label}<input data-f="${f}" type="number" inputmode="${mode || 'numeric'}" placeholder="${ph}" value="${esc(r[f])}"></label>`;
+  body.innerHTML = cardio
+    ? `<div class="ex-fields two">${field('minutes','Minutes','30')}${field('distance','Distance','—','decimal')}</div>`
+    : `<div class="ex-fields">
+      ${field('sets', timed ? 'Holds' : 'Sets', timed ? '1' : '3')}
+      ${timed ? field('seconds','Seconds each','60') : field('reps','Reps','10')}
+      ${field('weight','Weight','—','decimal')}
+    </div>
+    ${timed ? `<div class="timer-row"><button class="timer" type="button">▶ Time a hold</button><span class="holds"></span></div>` : ''}`;
+  body.querySelectorAll('input').forEach(i => i.oninput = () => {
+    r[i.dataset.f] = i.value;
+    if (r.holds.length && (i.dataset.f === 'sets' || i.dataset.f === 'seconds')) { r.holds = []; showHolds(r); }
+    if (i.dataset.f === 'minutes') syncDuration();
+  });
+  if (timed) { body.querySelector('.timer').onclick = () => r.timerStart ? finishHold(r) : startHold(r); showHolds(r); }
+  rowGoalHint(r);
+}
+// For duration activities, total minutes follows the logged minutes until you change it yourself
+function syncDuration(){
+  if (S.durTouched) return;
+  const total = EX.filter(r => r.kind === 'cardio').reduce((a, r) => a + (Number(r.minutes) || 0), 0);
+  if (total) { $('#dur').value = Math.round(total); xpPreview(); }
+}
+
+function startHold(r){
+  r.timerStart = Date.now();
+  const btn = r.el.querySelector('.timer'); btn.classList.add('run');
+  const upd = () => {
+    const s = Math.floor((Date.now() - r.timerStart)/1000);
+    btn.textContent = '■ Stop ' + mmss(s);
+    if (s && s % 30 === 0 && s !== r._lastBuzz) { r._lastBuzz = s; buzz(60); }
+  };
+  upd(); r.timerInt = setInterval(upd, 250);
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then(l => r.lock = l).catch(()=>{}); } catch(e){}
+  buzz(40);
+}
+function finishHold(r){
+  const secs = Math.round((Date.now() - r.timerStart)/1000);
+  stopTimer(r);
+  if (secs < 1) return;
+  r.holds.push(secs);
+  r.sets = String(r.holds.length);
+  r.seconds = String(Math.round(r.holds.reduce((a,b)=>a+b,0) / r.holds.length));
+  r.el.querySelector('[data-f=sets]').value = r.sets;
+  r.el.querySelector('[data-f=seconds]').value = r.seconds;
+  showHolds(r); buzz([40,60,40]);
+  toast(`Hold ${r.holds.length}: ${mmss(secs)}`);
+}
+function stopTimer(r){
+  clearInterval(r.timerInt); r.timerStart = null;
+  try { r.lock && r.lock.release(); } catch(e){} r.lock = null;
+  const btn = r.el && r.el.querySelector('.timer');
+  if (btn) { btn.classList.remove('run'); btn.textContent = '▶ Time a hold'; }
+}
+function showHolds(r){
+  const el = r.el.querySelector('.holds'); if (!el) return;
+  el.textContent = r.holds.length ? `Holds: ${r.holds.map(mmss).join(', ')} (best ${mmss(Math.max(...r.holds))})` : 'Or type holds and seconds above';
+}
+function rowGoalHint(r){
+  const el = r.el.querySelector('.ex-goal');
+  const g = D && D.goals.find(x => !isFastGoal(x) && x.exercise.toLowerCase() === r.name.trim().toLowerCase() && x.periods.W);
+  if (!g) { el.textContent = ''; return; }
+  const p = g.periods.W;
+  el.textContent = `🎯 This week: ${fmtVal(g.metric, g.kind, p.value)} of ${fmtVal(g.metric, g.kind, p.target)} ${unitWord(g.metric, g.kind)} (${metricLabel(g.metric, g.kind).toLowerCase()})`;
+}
+$('#addEx').onclick = () => addRow();
+
+function xpPreview(){
+  const d = Math.max(0, Number($('#dur').value) || 0);
+  const detailed = S.mode === 'Detailed' && EX.some(r => r.name.trim());
+  $('#xpPrev').textContent = '+' + (20 + Math.round(Math.min(d,90)/3) + (detailed ? 10 : 0)) + ' XP';
+}
+$$('[data-step]').forEach(b => b.onclick = () => { S.durTouched = true; $('#dur').value = Math.max(1, (Number($('#dur').value) || 0) + Number(b.dataset.step)); xpPreview(); });
+$('#dur').oninput = () => { S.durTouched = true; xpPreview(); };
+
+$('#logW').onclick = e => {
+  const exercises = EX.filter(r => r.name.trim()).map(r => ({ name: r.name, kind: r.kind, sets: r.sets, reps: r.reps, weight: r.weight, seconds: r.seconds, minutes: r.minutes, distance: r.distance, holds: r.holds }));
+  if (S.mode === 'Detailed' && !exercises.length) { toast('Add at least one exercise, or switch to Quick.', true); return; }
+  if (EX.some(r => r.timerStart)) { toast('Stop the running timer first.', true); return; }
+  act(e.currentTarget, 'logWorkout', {
+    mode: S.mode, type: S.type, duration: $('#dur').value, intensity: S.intensity,
+    exercises, date: $('#wDate').value, notes: $('#wNotes').value
+  }).then(r => {
+    if (!r) return;
+    $('#wNotes').value = ''; EX.forEach(stopTimer); EX = []; $('#exList').innerHTML = '';
+    S.durTouched = false;
+    if (S.mode === 'Detailed') addRow();
+    $('#wDate').value = todayStr(); showTab('home');
+  });
+};
+
+/* ---------- Fasting ---------- */
+$('#startF').onclick = e => {
+  const t = Number($('#customT').value) || S.target;
+  act(e.currentTarget, 'startFast', t, localIso($('#fStart').value)).then(r => { if (r) { $('#fStart').value=''; $('#customT').value=''; } });
+};
+$('#endF').onclick = e => {
+  const before = {};
+  D.goals.filter(isFastGoal).forEach(g => ['W','M','Y'].forEach(k => { if (g.periods[k]) before[g.id + k] = g.periods[k].value; }));
+  act(e.currentTarget, 'endFast', localIso($('#fEnd').value), $('#fNotes').value).then(r => {
+    if (!r) return;
+    $('#fEnd').value=''; $('#fNotes').value='';
+    if (!r.dashboard) return;
+    r.dashboard.goals.filter(isFastGoal).forEach(g => ['W','M','Y'].forEach(k => {
+      const p = g.periods[k];
+      if (p && before[g.id + k] < p.target && p.value >= p.target)
+        celebrations.push({ icon:'🎯', title:`${{W:'Weekly',M:'Monthly',Y:'Yearly'}[k]} fasting goal met`, sub:`${metricLabel(g.metric,'fast')}: ${fmtVal(g.metric,'fast',p.value)}. +${r.dashboard.goalXp[k]} XP` });
+    }));
+    nextCelebration();
+  });
+};
+$('#cancelF').onclick = e => { if (confirm('Cancel this fast? It won’t be saved.')) act(e.currentTarget, 'cancelFast'); };
+
+/* Progress colour: red at the start, through orange and yellow, to green at the target */
+const HUE_GREEN = 125;
+const pcolor = p => `hsl(${Math.round(HUE_GREEN * Math.max(0, Math.min(1, p)))} 80% var(--L))`;
+function hueStops(from, to, steps){
+  const out = [];
+  for (let i = 0; i <= steps; i++) { const f = from + (to - from) * i / steps; out.push(`${pcolor(f)} ${(f * 360).toFixed(2)}deg`); }
+  return out.join(', ');
+}
+
+/* Fasting stages. Timings are typical estimates; they vary by person, last meal and activity. */
+const STAGES = [
+  { from:0, to:4, icon:'🍽️', name:'Anabolic (fed) state', short:'Fed', desc:'Digesting your last meal and storing energy.', facts:[
+    'Your body is digesting your last meal and using that energy to refill glycogen in your muscles and liver.',
+    'Insulin is up right now, signalling cells to take in glucose and store nutrients. That’s the “anabolic” (building) part.',
+    'Protein, fat and fibre slow digestion, which is why a balanced last meal keeps you fuller for longer.',
+    'Water now helps later: staying hydrated early makes the next few hours easier.' ]},
+  { from:4, to:12, icon:'🔄', name:'Catabolic (post-absorptive)', short:'Catabolic', desc:'Insulin falls; your liver releases stored glucose.', facts:[
+    'Digestion is done. Insulin drops and glucagon rises, telling your liver to break down stored glycogen. That’s “catabolic” (breaking down).',
+    'Your liver holds roughly 100 g of glycogen, enough to keep blood sugar steady through a normal night.',
+    'Hunger tends to come in waves linked to your usual meal times. A glass of water and something to do often gets you past one.',
+    'Black coffee and plain tea are fine for most fasting goals and can take the edge off hunger.' ]},
+  { from:12, to:18, icon:'🔥', name:'Fat-burning mode', short:'Fat burn', desc:'Glycogen is running low, so fat becomes a bigger fuel source.', facts:[
+    'With liver glycogen getting low, your body leans harder on stored fat. Fat cells release fatty acids for fuel (lipolysis).',
+    'Your liver starts turning some of those fatty acids into ketones, an alternative fuel for your brain and muscles.',
+    'Many people find hunger actually eases around here once the body settles into using fat.',
+    'Light movement like a walk is a great match for this window.' ]},
+  { from:18, to:24, icon:'⚡', name:'Ketosis rising', short:'Ketosis', desc:'Ketone levels climb and become a real fuel source.', facts:[
+    'Ketones keep rising. Your brain can get a meaningful share of its energy from them instead of glucose.',
+    'Growth hormone levels rise during fasting, which may help your body hold on to muscle.',
+    'Some people notice a “second wind” of steady energy and focus in this stage.',
+    'Electrolytes matter more as fasts get longer. A pinch of salt in water can help if you feel flat.' ]},
+  { from:24, to:Infinity, icon:'♻️', name:'Autophagy zone', short:'Autophagy', desc:'Cellular clean-up is thought to ramp up.', facts:[
+    'Autophagy is how cells recycle worn-out parts. Fasting strongly boosts it in animal studies; exact timing in people isn’t known yet.',
+    'You’ve passed a full day. Ketones are now a major fuel source.',
+    'Keep up water and electrolytes (sodium, potassium, magnesium) on longer fasts.',
+    'If you feel dizzy, faint or unwell, end the fast. Stopping early still counts in your log.' ]},
+];
+const stageAt = h => STAGES.findIndex(s => h >= s.from && h < s.to);
+let factOffset = 0;
+
+S.fastView = (() => { try { return localStorage.getItem('fq-fast-view') || 'remaining'; } catch(e) { return 'remaining'; } })();
+function setFastView(v){
+  S.fastView = v;
+  try { localStorage.setItem('fq-fast-view', v); } catch(e){}
+  buzz(15); fastTick();
+}
+$('#ringWrap').onclick = () => setFastView(S.fastView === 'remaining' ? 'elapsed' : 'remaining');
+$('#viewSeg').onclick = e => { const b = e.target.closest('button'); if (b) setFastView(b.dataset.v); };
+
+function fastTick(){
+  const f = D && D.activeFast;
+  if (!f) {
+    const last = D && D.fasting.lastEndIso;
+    const ec = $('#eatCard');
+    if (ec) ec.innerHTML = last
+      ? `<h3>Eating window</h3><div class="num">${dur(Date.now() - new Date(last))}</div><div class="small muted">since your last fast ended at ${hm(new Date(last))}</div>`
+      : `<h3>Ready when you are</h3><div class="small muted">Pick a target and start your first fast.</div>`;
+    return;
+  }
+  const start = new Date(f.startIso), ms = Date.now() - start, hrs = ms / 36e5;
+  const targetMs = f.target * 36e5, done = ms >= targetMs, pct = Math.min(1, ms / targetMs);
+  const col = pcolor(pct), elapsedView = S.fastView === 'elapsed';
+  const deg = (pct * 360).toFixed(2);
+
+  // Ring: elapsed view fills the journey so far (red → now);
+  // remaining view shows the road ahead (now → green at the target).
+  $('#cring').style.background = done
+    ? pcolor(1)
+    : elapsedView
+      ? `conic-gradient(${hueStops(0, pct, 12)}, var(--line) ${deg}deg)`
+      : `conic-gradient(var(--line) 0deg ${deg}deg, ${hueStops(pct, 1, 12)})`;
+  $('#cring').classList.toggle('done', done);
+
+  if (elapsedView) {
+    $('#remLbl').textContent = 'Time elapsed';
+    $('#remaining').textContent = clock(ms);
+    $('#elapsedLbl').textContent = done ? `Target hit ${dur(ms - targetMs)} ago` : `${clock(targetMs - ms)} to go`;
+  } else {
+    $('#remLbl').textContent = done ? 'Past target by' : 'Time remaining';
+    $('#remaining').textContent = done ? '+' + clock(ms - targetMs) : clock(targetMs - ms);
+    $('#elapsedLbl').textContent = `${clock(ms)} fasted`;
+  }
+  $('#remaining').style.color = col;
+  $('#flipHint').textContent = elapsedView ? 'Tap for time remaining' : 'Tap for time elapsed';
+  $('#tab-fast').style.setProperty('--pc', col);
+  $$('#viewSeg button').forEach(b => b.classList.toggle('on', b.dataset.v === S.fastView));
+
+  // Hour blocks, each one a step along the red → green scale
+  const n = Math.ceil(f.target);
+  $('#hourBlocks').innerHTML = Array.from({length:n}, (_, i) => {
+    const fill = Math.max(0, Math.min(1, hrs - i));
+    return `<i style="background:linear-gradient(to right, ${pcolor((i + 1) / n)} ${fill*100}%, var(--line) 0)"></i>`;
+  }).join('');
+  $('#hourNow').textContent = done ? `All ${n} hours done` : `Hour ${Math.floor(hrs) + 1} of ${n}`;
+  $('#hourPct').textContent = `${Math.round(pct*100)}%`;
+
+  // Stage + rotating fun fact (new fact every 20 seconds, or tap for the next one)
+  const si = stageAt(hrs), st = STAGES[si], nx = STAGES[si + 1];
+  const fact = st.facts[(Math.floor(ms / 20000) + factOffset) % st.facts.length];
+  const range = st.to === Infinity ? `${st.from}h+` : `${st.from}–${st.to}h`;
+  const nextLine = nx ? `Next: ${nx.icon} ${nx.name} at ${nx.from}h, in ${dur(nx.from * 36e5 - ms)}${nx.from > f.target ? ' (past your target)' : ''}` : 'You’re in the final stage.';
+  const html = `<div class="stage-top"><div class="stage-icon">${st.icon}</div><div><div class="stage-name">${st.name}</div><div class="small muted">${range}. ${st.desc}</div></div></div>
+    <p class="stage-fact">💡 ${fact}</p>
+    <button class="fact-btn" id="nextFact">Another fact</button>
+    <div class="stage-next">${nextLine}</div>
+    <div class="stage-dots">${STAGES.map((x, i) => `<span class="${i < si ? 'past' : i === si ? 'now' : ''}">${x.icon}<br>${x.short}</span>`).join('')}</div>
+    <div class="small muted" style="margin-top:10px">Stage timings are typical estimates and vary from person to person.</div>`;
+  const sc = $('#stageCard');
+  if (sc._html !== html) { sc.innerHTML = html; sc._html = html; $('#nextFact').onclick = () => { factOffset++; fastTick(); }; }
+
+  // Home fast tile: live countdown, coloured on the same red → green scale
+  const tile = $('#tFastTile');
+  if (tile) {
+    tile.style.background = `hsl(${Math.round(HUE_GREEN * pct)} 85% 62%)`; tile.style.color = '#10162B';
+    $('#tFast').textContent = elapsedView ? clock(ms).replace(/:\d\d$/, '') : done ? 'Target hit' : dur(targetMs - ms);
+    $('#tFastLbl').textContent = elapsedView ? '⏱️ fasted so far' : done ? '⏱️ end it when ready' : '⏱️ left in fast';
+    $('#tFastSub').textContent = `${Math.round(pct*100)}% of ${f.target}h, ${st.icon} ${st.short}`;
+    $('#actFast').textContent = '⏱ View fast';
+  }
+
+  // Live "today" bar in the 14-day chart
+  const live = $('#fLive');
+  if (live) { const max = Number(live.dataset.max); live.style.height = Math.min(100, (Number(live.dataset.base) + hrs) / max * 100) + '%'; live.style.setProperty('--c', col); }
+}
+
+function renderFastGoals(d){
+  const P = S.period, fg = d.goals.filter(g => isFastGoal(g));
+  if (!fg.length) { $('#fastGoals').innerHTML = ''; return; }
+  const rows = [];
+  fg.forEach(g => ['W','M','Y'].forEach(k => {
+    const p = g.periods[k]; if (!p) return;
+    const pct = Math.min(100, Math.round(p.value / p.target * 100));
+    rows.push(`<div class="goal"><div class="goal-top"><span>${esc(metricLabel(g.metric,'fast'))} <span class="small muted">this ${{W:'week',M:'month',Y:'year'}[k]}</span></span>
+      <span class="num" style="font-size:18px">${fmtVal(g.metric,'fast',p.value)}/${fmtVal(g.metric,'fast',p.target)}${pct >= 100 ? ' ✅' : ''}</span></div>
+      <div class="bar"><span style="width:${pct}%;background:var(--tide)"></span></div></div>`);
+  }));
+  $('#fastGoals').innerHTML = `<div class="sec-title">Fasting goals</div><div class="card">${rows.join('')}</div>`;
+}
+function renderFastCharts(d){
+  const fz = d.fasting, f = d.activeFast;
+  const liveHrs = f ? (Date.now() - new Date(f.startIso)) / 36e5 : 0;
+  const max = Math.max(1, ...fz.days14.map(x => Math.max(x.hrs + (x.today ? liveHrs : 0), x.target)), f ? f.target : 0) * 1.08;
+  $('#fChart').innerHTML = fz.days14.map(x => {
+    const bars = [];
+    if (x.today && f) {
+      bars.push(`<div class="b striped" id="fLive" data-base="${x.hrs}" data-max="${max}" style="height:${(x.hrs + liveHrs)/max*100}%"></div>`);
+    } else {
+      bars.push(`<div class="b" style="height:${x.hrs/max*100}%;background:${x.hrs ? pcolor(x.target ? x.hrs / x.target : 1) : 'var(--line)'}"></div>`);
+    }
+    const tgt = (x.today && f) ? f.target : x.target;
+    return `<div class="col"><span class="v">${x.hrs ? x.hrs : ''}</span>${bars.join('')}${tgt ? `<i class="tgt" style="bottom:${tgt/max*100}%"></i>` : ''}</div>`;
+  }).join('');
+  $('#fChartX').innerHTML = fz.days14.map(x => `<span class="${x.today ? 'today' : ''}">${x.dow}<br>${x.date}</span>`).join('');
+  $('#fAvg7').textContent = fz.avg7 || '0';
+  $('#fRate').textContent = fz.rate30 + '%';
+  $('#fDays').textContent = fz.days30;
+  $('#calLabel').textContent = 'Fasting calendar, ' + fz.calendarLabel;
+  $('#cal').innerHTML = ['M','T','W','T','F','S','S'].map(h => `<div class="h">${h}</div>`).join('') +
+    fz.calendar.map(c => `<div class="d ${c.status === -1 ? 'fut' : 's' + c.status}${c.today ? ' today' : ''}" title="${c.hrs ? c.hrs + 'h' : ''}"${c.status > 0 ? ` style="background:${pcolor(c.target ? c.hrs / c.target : 1)}"` : ''}>${c.date}</div>`).join('');
+}
+
+/* ---------- Goals ---------- */
+seg($('#periodSeg'), 'p', p => { S.period = p; renderGoals(D); });
+function goalStatus(g, p){
+  const k = g.kind, m = g.metric, v = p.value, t = p.target;
+  const left = Math.max(0, t - v), unit = unitWord(m, k);
+  if (v >= t) return ['done', `Goal met. +${D.goalXp[S.period]} XP`];
+  if (m === 'Best') return ['behind', `Best so far ${fmtVal(m,k,v)}. ${fmtVal(m,k,left)} ${unit} to go.`];
+  const perDay = left / Math.max(1, p.daysLeft);
+  const per = `${fmtVal(m,k,perDay)} ${unit} a day`.replace(/\s+/g,' ');
+  if (v >= p.expected) return ['ahead', `On pace. ${fmtVal(m,k,left)} ${unit} to go, about ${per}.`];
+  return ['behind', `Behind pace by ${fmtVal(m,k,p.expected - v)} ${unit}. Need about ${per}.`];
+}
+function historyChart(g, p){
+  const vals = p.history.map(h => h.value), max = Math.max(1, ...vals, p.target) * 1.08;
+  return `<div class="chart">${p.history.map((h, i) => {
+      const last = i === p.history.length - 1;
+      return `<div class="col"><span class="v">${h.value ? fmtVal(g.metric, g.kind, h.value) : ''}</span><div class="b" style="height:${h.value/max*100}%;background:${h.value >= p.target ? 'var(--gold)' : last ? 'color-mix(in srgb,var(--gold) 55%,var(--panel))' : 'var(--line)'}"></div></div>`;
+    }).join('')}<div class="goal-line" style="bottom:${p.target/max*100}%"></div></div>
+    <div class="chart-x">${p.history.map(h => `<span>${esc(h.label)}</span>`).join('')}</div>
+    <div class="legend"><span><i style="background:var(--gold)"></i>Target met</span><span><i style="border-top:2px dashed var(--gold);height:0;width:14px;border-radius:0"></i>Target</span></div>`;
+}
+function renderGoals(d){
+  const P = S.period, word = {W:'week', M:'month', Y:'year'}[P];
+  $('#periodInfo').textContent = `${d.periods[P].label}, ${d.periods[P].daysLeft} day${d.periods[P].daysLeft === 1 ? '' : 's'} left including today. Hitting a ${word}ly goal earns ${d.goalXp[P]} XP.`;
+  const active = d.goals.filter(g => g.periods[P]);
+  const missing = d.goals.filter(g => !g.periods[P]);
+  if (!d.goals.length) {
+    $('#goalList').innerHTML = `<div class="card"><h3>No goals yet</h3>
+      <p class="small muted" style="margin-top:0">Set a target for any exercise and track it by week, month and year. Try one of these:</p>
+      <div class="chips">
+        <button class="chip sm" data-sug='{"exercise":"Plank","kind":"time","metric":"Time","week":10}'>Plank, 10 min a week</button>
+        <button class="chip sm" data-sug='{"exercise":"Push-up","kind":"reps","metric":"Reps","week":300}'>Push-ups, 300 a week</button>
+        <button class="chip sm" data-sug='{"exercise":"Squat","kind":"reps","metric":"Sets","week":12}'>Squats, 12 sets a week</button>
+        <button class="chip sm" data-sug='{"exercise":"Plank","kind":"time","metric":"Best","week":90}'>Plank, hold 90s</button>
+        <button class="chip sm" data-sug='{"exercise":"Fasting","kind":"fast","metric":"OnTarget","week":5}'>Fasting, 5 on target a week</button>
+      </div></div>`;
+    $$('[data-sug]').forEach(b => b.onclick = () => openGoal(null, JSON.parse(b.dataset.sug)));
+    return;
+  }
+  $('#goalList').innerHTML = active.map(g => {
+    const p = g.periods[P], pct = Math.min(100, Math.round(p.value / p.target * 100));
+    const [cls, text] = goalStatus(g, p);
+    const pace = p.expected != null && p.value < p.target ? `<i class="pace" style="left:${Math.min(100, p.expected / p.target * 100)}%" title="Where you’d be on an even pace"></i>` : '';
+    return `<div class="card goal-card">
+      <div class="gc-top"><div><div class="gc-name">${esc(g.exercise)}${g.kind === 'time' ? ' ⏱' : ''}</div><div class="gc-metric">${esc(metricLabel(g.metric, g.kind))}${isFastGoal(g) ? ', <span class="auto">updates automatically</span>' : ''}</div></div>
+        <div style="display:flex;gap:6px"><button class="edit" data-edit="${g.id}">Edit</button>${isFastGoal(g)
+          ? `<button class="edit log-btn" onclick="showTab('fast')">Fast tab</button>`
+          : `<button class="edit log-btn" data-ql="${g.id}">+ Log</button>`}</div></div>
+      ${looksLikeFasting(g) ? `<div class="convert">This goal only moves when you log it by hand. <button data-convert="${g.id}">Make it automatic from your fasts</button></div>` : ''}
+      <div class="gc-val"><span class="num">${fmtVal(g.metric, g.kind, p.value)}</span><span class="of">/ ${fmtVal(g.metric, g.kind, p.target)} ${unitWord(g.metric, g.kind)}</span><span class="pct">${pct}%</span></div>
+      <div class="gbar"><span style="width:${pct}%"></span>${pace}</div>
+      <div class="gc-status ${cls}">${esc(text)}</div>
+      ${isFastGoal(g) && D.activeFast && (g.metric === 'Hours') ? `<div class="small muted" style="margin-top:4px">Your current fast adds to this when you end it.</div>` : ''}
+      <details><summary>History by ${word}</summary>${historyChart(g, p)}</details>
+    </div>`;
+  }).join('') + (missing.length ? `<p class="no-target">No ${word}ly target for ${missing.map(g => `<button data-edit="${g.id}">${esc(g.exercise)} (${esc(metricLabel(g.metric,g.kind).toLowerCase())})</button>`).join(', ')}. Tap to add one.</p>` : '');
+  $$('#goalList [data-edit]').forEach(b => b.onclick = () => openGoal(d.goals.find(g => String(g.id) === b.dataset.edit)));
+  $$('#goalList [data-ql]').forEach(b => b.onclick = () => openQuickLog(d.goals.find(g => String(g.id) === b.dataset.ql)));
+  $$('#goalList [data-convert]').forEach(b => b.onclick = () => openGoal(d.goals.find(g => String(g.id) === b.dataset.convert), null, true));
+}
+
+const TITLES = ['Rookie','Novice','Grinder','Contender','Athlete','Warrior','Champion','Elite','Titan','Legend'];
+const xpAt = L => { let t = 0; for (let i = 1; i < L; i++) t += 100 + (i - 1) * 50; return t; };
+const TYPE_ICON = { 'Strength':'🏋️', 'Cardio':'❤️', 'HIIT':'⚡', 'Run':'🏃', 'Walk':'🚶', 'Cycling':'🚴', 'Yoga / Mobility':'🧘', 'Sports':'⚽', 'Other':'💪' };
+function recentIcon(r){
+  if (r.kind === 'fast') return '⏱️';
+  if (r.kind === 'goal') return '🎯';
+  return TYPE_ICON[r.title.split(',')[0]] || '💪';
+}
+function renderHomeHero(d){
+  // Greeting
+  const h = new Date().getHours();
+  $('#greetHi').textContent = (h < 5 ? 'Up late' : h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening') + ', champ';
+  const w = d.week, left = Math.max(0, w.workoutGoal - w.workouts);
+  $('#greetSub').textContent = d.activeFast ? 'Fast in progress. Stay strong.'
+    : w.workoutGoalHit && w.fastGoalHit ? 'Both weekly goals smashed. Legend behaviour.'
+    : w.workoutGoalHit ? 'Workout goal hit this week. Keep the streak alive.'
+    : `${left} workout${left === 1 ? '' : 's'} to hit this week’s goal.`;
+
+  // Hero
+  $('#lvl').textContent = d.level;
+  $('#rank').textContent = `Level ${d.level}, ${d.title}`;
+  $('#xpTotal').textContent = d.xp.toLocaleString();
+  const filled = Math.round(d.into / d.need * 20);
+  $('#meter').innerHTML = Array.from({length:20}, (_, i) => `<i class="${i < filled ? 'f' : ''}"></i>`).join('');
+  const ti = Math.floor((d.level - 1) / 3), toLevel = d.need - d.into;
+  $('#xpInto').textContent = ti < TITLES.length - 1
+    ? `${(xpAt((ti + 1) * 3 + 1) - d.xp).toLocaleString()} XP to ${TITLES[ti + 1]}, ${toLevel.toLocaleString()} to level ${d.level + 1}`
+    : `${toLevel.toLocaleString()} XP to level ${d.level + 1}`;
+
+  // Tiles
+  $('#tStreak').textContent = d.streaks.active;
+  $('#tStreakSub').textContent = `fasting ${d.streaks.fast}d, goal weeks ${d.streaks.goalWeeks}`;
+  $('#tWork').textContent = `${w.workouts}/${w.workoutGoal}${w.workoutGoalHit ? ' ✅' : ''}`;
+  $('#tWorkSub').textContent = `${w.minutes} min, ${w.xp} XP this week`;
+  const c = d.challenge, cp = Math.round(c.progress / c.target * 100);
+  $('#tChal').textContent = c.done ? 'Done ✅' : cp + '%';
+  $('#tChalSub').textContent = c.done ? `+${c.xp} XP earned` : c.text;
+  $('#chHead').textContent = c.done ? 'Weekly challenge complete' : 'Weekly challenge';
+  $('#chText').textContent = c.text;
+  $('#chBar').style.width = cp + '%';
+  $('#chProg').textContent = `${c.progress} / ${c.target} ${c.unit}`.trim();
+  $('#chXp').textContent = c.done ? `+${c.xp} XP earned` : `+${c.xp} XP`;
+  if (!d.activeFast) {
+    const t = $('#tFastTile'); t.style.background = ''; t.style.color = '';
+    $('#tFast').textContent = `${w.fastsMet}/${w.fastGoal}${w.fastGoalHit ? ' ✅' : ''}`;
+    $('#tFastLbl').textContent = '⏱️ fasts on target';
+    $('#tFastSub').textContent = d.fasting.avg7 ? `7-day average ${d.fasting.avg7}h` : 'Tap to start a fast';
+    $('#actFast').textContent = '▶ Start a fast';
+  }
+}
+$$('#tab-home [data-go]').forEach(b => b.addEventListener('click', () => showTab(b.dataset.go)));
+$('#tChalTile').onclick = () => $('#chCard').scrollIntoView({ behavior:'smooth', block:'center' });
+
+function renderHomeGoals(d){
+  const wk = d.goals.filter(g => g.periods.W);
+  if (!wk.length) {
+    $('#homeGoals').innerHTML = `<div class="fast-mini"><div><h3 style="margin-bottom:4px">Exercise goals</h3><div class="small muted">Track planks, push-ups or any lift by week, month and year.</div></div><button class="chip" onclick="showTab('goals')">Set a goal</button></div>`;
+    return;
+  }
+  $('#homeGoals').innerHTML = `<h3>Exercise goals this week <span class="small">(tap to log)</span></h3>` + wk.slice(0, 4).map(g => {
+    const p = g.periods.W, pct = Math.min(100, Math.round(p.value / p.target * 100));
+    return `<button class="goal goal-tap" data-ql="${g.id}"><div class="goal-top"><span>${esc(g.exercise)} <span class="small muted">${esc(metricLabel(g.metric,g.kind).toLowerCase())}</span></span>
+      <span class="num" style="font-size:18px">${fmtVal(g.metric,g.kind,p.value)}/${fmtVal(g.metric,g.kind,p.target)}${pct >= 100 ? ' ✅' : ''}<span class="plus">${isFastGoal(g) ? '⏱' : '+'}</span></span></div>
+      <div class="bar gold"><span style="width:${pct}%"></span></div></button>`;
+  }).join('') + (wk.length > 4 ? `<button class="link" onclick="showTab('goals')">See all ${wk.length} goals</button>` : '');
+  $$('#homeGoals [data-ql]').forEach(b => b.onclick = () => {
+    const g = d.goals.find(x => String(x.id) === b.dataset.ql);
+    if (isFastGoal(g)) showTab('fast'); else openQuickLog(g);
+  });
+}
+
+/* Goal dialog */
+const GD = { kind:'reps', metric:'Reps' };
+function setGdKind(k){
+  GD.kind = k;
+  $$('#gdKind button').forEach(b => b.classList.toggle('on', b.dataset.k === k));
+  if (!METRIC_INFO[k].some(m => m[0] === GD.metric)) GD.metric = METRIC_INFO[k][0][0];
+  const fast = k === 'fast';
+  $('#gdExLabel').hidden = fast; $('#gdPick').hidden = fast;
+  if (fast) $('#gdEx').hidden = true;
+  else { const o = exerciseOptions(GD.exercise === 'Fasting' ? '' : GD.exercise, 'All'); $('#gdPick').innerHTML = o.html; $('#gdEx').hidden = !o.custom; }
+  renderGdMetrics();
+}
+function renderGdMetrics(){
+  $('#gdMetric').innerHTML = METRIC_INFO[GD.kind].map(([m,l]) => `<button class="chip sm${m === GD.metric ? ' on' : ''}" data-m="${m}">${l}</button>`).join('');
+  const info = METRIC_INFO[GD.kind].find(x => x[0] === GD.metric);
+  $('#gdHint').textContent = (info ? info[2] : '') + (GD.kind === 'fast' ? '. Updates automatically, no logging needed.' : '');
+  const u = GD.metric === 'Time' ? 'minutes' : (GD.metric === 'Best' && GD.kind === 'time') ? 'seconds' : (unitWord(GD.metric, GD.kind) || (GD.metric === 'Best' ? 'weight' : 'volume'));
+  $('#gdUnit').textContent = `Targets (${u}). Leave any blank to skip it.`;
+}
+$('#gdMetric').onclick = e => { const b = e.target.closest('.chip'); if (b) { GD.metric = b.dataset.m; renderGdMetrics(); } };
+$$('#gdKind button').forEach(b => b.onclick = () => setGdKind(b.dataset.k));
+bindPicker($('#gdPick'), $('#gdEx'), (name, kind) => { GD.exercise = name; if (kind && kind !== GD.kind) setGdKind(kind); });
+const toInput = (m, v) => !v ? '' : m === 'Time' ? Math.round(v/60*10)/10 : v;
+const fromInput = (m, v) => v === '' ? 0 : m === 'Time' ? Math.round(Number(v)*60) : Number(v);
+function openGoal(g, preset, convert){
+  editingGoal = g || null;
+  let src = g ? { exercise:g.exercise, kind:g.kind, metric:g.metric, W:g.targets.W, M:g.targets.M, Y:g.targets.Y }
+                : { exercise:(preset && preset.exercise) || '', kind:(preset && preset.kind) || 'reps', metric:(preset && preset.metric) || 'Reps', W: preset && preset.metric === 'Time' ? preset.week*60 : (preset && preset.week) || 0, M:0, Y:0 };
+  if (convert && g) {
+    // Map a hand-logged "fasting" goal onto automatic fasting measures
+    const m = g.metric === 'Time' ? 'Hours' : g.metric === 'Sessions' ? 'Sessions' : 'OnTarget';
+    const conv = v => !v ? 0 : g.metric === 'Time' ? Math.round(v / 3600 * 10) / 10 : g.metric === 'Best' && g.kind === 'time' ? Math.round(v / 3600 * 10) / 10 : v;
+    src = { exercise:'Fasting', kind:'fast', metric:m, W:conv(g.targets.W), M:conv(g.targets.M), Y:conv(g.targets.Y) };
+  }
+  $('#gdTitle').textContent = convert ? 'Make fasting goal automatic' : g ? 'Edit goal' : 'New goal';
+  const o = exerciseOptions(src.exercise, 'All');
+  $('#gdPick').innerHTML = o.html; $('#gdEx').hidden = !o.custom; $('#gdEx').value = o.custom ? src.exercise : '';
+  GD.exercise = src.exercise;
+  GD.metric = src.metric; setGdKind(src.kind);
+  $('#gdW').value = toInput(src.metric, src.W); $('#gdM').value = toInput(src.metric, src.M); $('#gdY').value = toInput(src.metric, src.Y);
+  $('#gdDelete').hidden = !g;
+  $('#goalDlg').showModal();
+}
+$('#addGoal').onclick = () => openGoal(null);
+$('#gdCancel').onclick = () => $('#goalDlg').close();
+$('#gdFill').onclick = () => {
+  const w = Number($('#gdW').value); if (!w) { toast('Enter a weekly target first.', true); return; }
+  if (GD.metric === 'Best') { $('#gdM').value = w; $('#gdY').value = w; return; }
+  $('#gdM').value = Math.round(w * 4.35 * 10) / 10; $('#gdY').value = Math.round(w * 52);
+};
+$('#gdSave').onclick = e => {
+  const m = GD.metric;
+  act(e.currentTarget, 'saveGoal', {
+    id: editingGoal ? editingGoal.id : null, exercise: GD.exercise, kind: GD.kind, metric: m,
+    week: fromInput(m, $('#gdW').value), month: fromInput(m, $('#gdM').value), year: fromInput(m, $('#gdY').value)
+  }).then(r => { if (r) $('#goalDlg').close(); });
+};
+$('#gdDelete').onclick = e => {
+  if (!editingGoal || !confirm(`Delete the ${editingGoal.exercise} goal?`)) return;
+  act(e.currentTarget, 'deleteGoal', editingGoal.id).then(r => { if (r) $('#goalDlg').close(); });
+};
+
+/* ---------- Stats ---------- */
+seg($('#statsSeg'), 'v', v => { $('#statsTrends').hidden = v !== 'trends'; $('#statsBadges').hidden = v !== 'badges'; });
+
+/* ---------- Render ---------- */
+function render(d){
+  D = d;
+  saveSnapshot(d);
+  $('#loading').style.display = 'none';
+  if (!$('.tab.on')) showTab('home');
+
+  renderHomeHero(d);
+  // Fasting
+  const f = d.activeFast;
+  $('#fastIdle').hidden = !!f; $('#fastActive').hidden = !f;
+  clearInterval(tick);
+  if (f) {
+    const st = new Date(f.startIso);
+    $('#fStarted').textContent = hm(st); $('#fTarget').textContent = f.target + 'h';
+    $('#fDoneAt').textContent = hm(new Date(st.getTime() + f.target * 36e5));
+  } else if (!S._targetSet) { S.target = d.settings.defaultFast; S._targetSet = true; }
+  chips($('#targetChips'), TARGETS, 'target', t => t.l, t => t.h, () => $('#customT').value = '');
+  renderFastCharts(d);
+  renderFastGoals(d);
+  fastTick(); tick = setInterval(fastTick, 1000);
+
+  // Recent
+  $('#recent').innerHTML = d.recent.length ? d.recent.slice(0, 5).map(r =>
+    `<li><span class="dot d-${r.kind}">${recentIcon(r)}</span><div><div class="t">${esc(r.title)}</div><div class="s">${esc(r.sub)}</div></div>${r.xp ? `<span class="xp">+${r.xp}</span>` : `<span class="tag">goal log</span>`}</li>`
+  ).join('') : '<li class="empty">Nothing logged yet. Log a workout or start a fast to earn your first XP.</li>';
+
+  // Goals
+  renderGoals(d); renderHomeGoals(d);
+  EX.forEach(rowGoalHint);
+
+  // Trends
+  $('#tW').textContent = d.totals.workouts; $('#tF').textContent = d.totals.fastsMet;
+  $('#tL').textContent = d.totals.longest; $('#tC').textContent = d.totals.challenges;
+  const chart = (title, key, color, fmt) => {
+    const vals = d.trends.map(t => t[key]), max = Math.max(1, ...vals) * 1.08;
+    return `<div class="card"><h3>${title}</h3><div class="chart">${vals.map(v =>
+      `<div class="col"><span class="v">${v ? (fmt ? fmt(v) : v) : ''}</span><div class="b" style="height:${v / max * 100}%;background:${v ? color : 'var(--line)'}"></div></div>`).join('')}</div>
+      <div class="chart-x">${d.trends.map(t => `<span>${t.label}</span>`).join('')}</div></div>`;
+  };
+  $('#charts').innerHTML =
+    chart('Workouts per week', 'workouts', 'var(--ember)') +
+    chart('Workout minutes per week', 'minutes', 'var(--ember)') +
+    chart('Fasts on target per week', 'fastsMet', 'var(--tide)') +
+    chart('Average fast length (hours)', 'avgFast', 'var(--tide)', v => v.toFixed(1)) +
+    chart('XP per week', 'xp', 'var(--gold)');
+  $('#sheetLink').href = d.sheetUrl;
+
+  // Badges
+  $('#badgeCount').textContent = `${d.badges.filter(b => b.earned).length}/${d.badges.length}`;
+  $('#badges').innerHTML = d.badges.map(b =>
+    `<div class="badge ${b.earned ? 'got' : 'locked'}"><div class="e">${b.icon}</div><div class="n">${esc(b.name)}</div><div class="d">${b.earned ? 'Earned ' + esc(b.on) : esc(b.desc)}</div></div>`).join('');
+
+  // Exercise suggestions: your history first, then the library
+  const names = [...new Set([...d.exerciseHistory.map(x => x.name), ...Object.values(LIB).flat().map(x => x[0])])];
+  $('#exNames').innerHTML = names.map(n => `<option value="${esc(n)}">`).join('');
+  renderLib();
+
+  $('#setW').value = d.settings.workoutGoal; $('#setF').value = d.settings.fastGoal; $('#setD').value = d.settings.defaultFast;
+  const [bm, bd] = d.settings.birthday.split('-').map(Number);
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  $('#setBM').innerHTML = MONTHS.map((m, i) => `<option value="${i + 1}"${i + 1 === bm ? ' selected' : ''}>${m}</option>`).join('');
+  $('#setBD').innerHTML = Array.from({length:31}, (_, i) => `<option value="${i + 1}"${i + 1 === bd ? ' selected' : ''}>${i + 1}</option>`).join('');
+  const ord = n => n + (n % 10 === 1 && n !== 11 ? 'st' : n % 10 === 2 && n !== 12 ? 'nd' : n % 10 === 3 && n !== 13 ? 'rd' : 'th');
+  $('#gdMLbl').textContent = bd === 1 ? 'Per month' : `Per month (from the ${ord(bd)})`;
+  $('#gdYLbl').textContent = bm === 1 && bd === 1 ? 'Per year' : 'Per birthday year';
+  const bc = $('#bdayCard');
+  bc.hidden = !d.periods.birthdayToday;
+  if (d.periods.birthdayToday) bc.innerHTML = `<div class="fast-mini"><div><h3 style="margin-bottom:4px">🎂 Happy birthday!</h3>
+    <div class="small muted">Your new fitness year starts today. Yearly goals have reset, so set this year’s targets.</div></div>
+    <button class="chip" onclick="showTab('goals');document.querySelector('#periodSeg [data-p=Y]').click()">Yearly goals</button></div>`;
+
+  if (lastLevel !== null && d.level > lastLevel) celebrations.push({ icon:'⬆️', title:`Level ${d.level}`, sub:`You’re now a ${d.title}` });
+  lastLevel = d.level;
+  d.newBadges.forEach(b => celebrations.push({ icon:b.icon, title:'Badge unlocked', sub:b.name }));
+  nextCelebration();
+}
+
+function nextCelebration(){
+  const el = $('#celebrate');
+  if (el.classList.contains('show') || !celebrations.length) return;
+  const c = celebrations.shift();
+  $('#celIcon').textContent = c.icon; $('#celTitle').textContent = c.title; $('#celSub').textContent = c.sub;
+  el.classList.add('show'); buzz([40,60,40]);
+}
+$('#celebrate').onclick = () => { $('#celebrate').classList.remove('show'); setTimeout(nextCelebration, 150); };
+
+/* ---------- Settings ---------- */
+$('#openSettings').onclick = () => { renderConnLine(); $('#settings').showModal(); };
+$('#closeSet').onclick = () => $('#settings').close();
+$('#saveSet').onclick = e => act(e.currentTarget, 'saveSettings', { workoutGoal: $('#setW').value, fastGoal: $('#setF').value, defaultFast: $('#setD').value, birthday: `${$('#setBM').value}-${$('#setBD').value}` })
+  .then(r => { if (r) $('#settings').close(); });
+
+/* ---------- Init ---------- */
+chips($('#typeChips'), TYPES, 'type', t => t, t => t, onTypeChange);
+function onTypeChange(){
+  if (D) renderLib();
+  EX.forEach(r => {
+    const o = exerciseOptions(r.name);
+    r.el.querySelector('.ex-pick').innerHTML = o.html;
+    const other = r.el.querySelector('.ex-other');
+    other.hidden = !o.custom; if (o.custom) other.value = r.name;
+  });
+}
+chips($('#intChips'), INTENSITY, 'intensity', t => t, t => t);
+$('#durChips').innerHTML = DUR.map(m => `<button class="chip" data-m="${m}">${m}</button>`).join('');
+$('#durChips').onclick = e => { const b = e.target.closest('.chip'); if (b) { S.durTouched = true; $('#dur').value = b.dataset.m; xpPreview(); } };
+$('#wDate').value = todayStr();
+xpPreview();
+/* ---------- Fast start: paint instantly, then sync in the background ---------- */
+const SNAP_KEY = 'fq-dashboard-v1';
+function saveSnapshot(d){
+  try { localStorage.setItem(SNAP_KEY, JSON.stringify(Object.assign({}, d, { newBadges: [] }))); } catch(e){}
+}
+function loadSnapshot(){
+  try { const s = localStorage.getItem(SNAP_KEY); return s ? JSON.parse(s) : null; } catch(e){ return null; }
+}
+let lastSync = 0, syncing = false;
+function refresh(){
+  if (syncing || !cfg()) return;
+  syncing = true; $('#sync').hidden = !D; $('#sync').textContent = 'Syncing…';
+  flushQueue().then(() => call('getDashboard'))
+    .then(d => { lastSync = Date.now(); render(d); })
+    .catch(e => { if (!D) $('#loading').textContent = 'Couldn’t load: ' + ((e && e.message) || e) + '. Run setup() in the script editor, then reload.'; })
+    .finally(() => { syncing = false; $('#sync').hidden = true; showQueue(); });
+}
+function showConnect(){
+  $('#loading').style.display = 'none';
+  $$('.tab').forEach(t => t.classList.remove('on'));
+  $('#nav').hidden = true; $('#connect').hidden = false;
+  const c = cfg(); if (c) { $('#cUrl').value = c.url; }
+}
+$('#cGo').onclick = async () => {
+  const btn = $('#cGo');
+  const url = $('#cUrl').value.trim(), token = $('#cToken').value.trim();
+  if (!/^https:\/\/script\.google\.com\/.+\/exec$/.test(url)) { toast('The link should start with https://script.google.com and end in /exec.', true); return; }
+  if (token.length < 20) { toast('Paste the full token from the Execution log.', true); return; }
+  btn.disabled = true;
+  try {
+    const d = await apiFetch('getDashboard', [], { url, token });
+    setCfg({ url, token });
+    $('#connect').hidden = true; $('#nav').hidden = false; $('#cToken').value = '';
+    lastSync = Date.now(); render(d); showTab('home'); toast('Connected');
+  } catch(err) { toast(err.message, true); }
+  finally { btn.disabled = false; }
+};
+function renderConnLine(){
+  const c = cfg();
+  $('#connLine').innerHTML = c ? `Connected to Apps Script (…${esc(c.url.slice(-18))}). <button id="changeConn">Change connection</button>` : '';
+  const b = $('#changeConn');
+  if (b) b.onclick = () => { if (confirm('Disconnect this phone? Your data stays in the Google Sheet.')) { setCfg(null); $('#settings').close(); showConnect(); } };
+}
+if (!cfg()) showConnect();
+else {
+  const snap = loadSnapshot();
+  if (snap) render(snap);                              // last known data, shown instantly
+  showQueue();
+  refresh();
+}
+// Offline support and home-screen install
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && !EX.some(r => r.timerStart) && Date.now() - lastSync > 60000) refresh();
+});
+</script>
+</body>
+</html>
