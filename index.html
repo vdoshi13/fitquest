@@ -300,6 +300,22 @@ nav button.on .i{filter:none}
   padding:12px 18px;border-radius:14px;font-weight:600;z-index:40;transition:transform .3s;max-width:90vw;text-align:center}
 #toast.show{transform:translate(-50%,0)}
 #toast.err{border-color:var(--bad);color:var(--bad)}
+.hold{position:fixed;inset:0;z-index:25;background:var(--ink);display:flex;flex-direction:column;
+  padding:calc(14px + env(safe-area-inset-top)) 20px calc(18px + env(safe-area-inset-bottom))}
+.hold[hidden]{display:none}
+.hold-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.hold-name{font:800 34px/1 var(--display)}
+.hold-x{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-weight:600;color:var(--muted)}
+.hold-ring-wrap{position:relative;width:min(84vw,46vh);margin:auto;user-select:none;-webkit-user-select:none}
+.hold-time{font:800 clamp(64px,22vw,104px)/1 var(--display);font-variant-numeric:tabular-nums;transition:color .4s}
+.hold-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
+.hold-stats div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
+.hold-stats span{display:block;font-size:12px;color:var(--muted)}
+.hold-stats b{font-size:22px}
+.hold-stop{width:100%;min-height:76px;border:0;border-radius:20px;background:var(--bad);color:#fff;font:800 28px/1 var(--display);letter-spacing:.3px}
+.hold-stop.go{background:var(--tide);color:#04202F}
+.hold-stop:disabled{opacity:.6}
+.hold.best .hold-time{color:var(--gold)}
 #celebrate{position:fixed;inset:0;display:none;place-content:center;text-align:center;z-index:30;background:rgba(8,10,22,.82)}
 #celebrate.show{display:grid}
 #celebrate .big{font-size:84px;animation:pop .5s cubic-bezier(.2,1.6,.4,1)}
@@ -516,6 +532,20 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 
 <datalist id="exNames"></datalist>
 <div id="toast" role="status"></div>
+<div id="holdScreen" class="hold" hidden>
+  <div class="hold-top"><div><div class="hold-name" id="hName">Plank</div><div class="small muted" id="hGoal"></div></div><button class="hold-x" id="hCancel">Cancel</button></div>
+  <div class="hold-ring-wrap" id="hRingWrap">
+    <div class="cring" id="hRing"></div>
+    <div class="ring-text"><div class="lbl" id="hLbl">Get ready</div><div class="hold-time" id="hTime">3</div><div class="lbl" id="hSub">Tap to start now</div></div>
+  </div>
+  <div class="hold-stats">
+    <div><span>Best hold</span><b class="num" id="hBest">–</b></div>
+    <div><span>Holds today</span><b class="num" id="hCount">0</b></div>
+    <div><span>Ring fills to</span><b class="num" id="hRef">1:00</b></div>
+  </div>
+  <button class="hold-stop" id="hStop">Stop &amp; log</button>
+  <button class="link" id="hManual">Enter the time manually instead</button>
+</div>
 <div id="celebrate"><div><div class="big" id="celIcon"></div><div class="t" id="celTitle"></div><div class="s" id="celSub"></div><div class="s small" style="margin-top:22px">Tap to continue</div></div></div>
 
 <dialog id="settings">
@@ -622,7 +652,10 @@ async function apiFetch(fn, args, c){
   try {
     res = await fetch(c.url, { method:'POST', redirect:'follow', headers:{ 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify({ token: c.token, action: fn, args }) });
-  } catch(e) { throw new NetError('You’re offline.'); }
+  } catch(e) {
+    throw new NetError(navigator.onLine === false ? 'You’re offline.'
+      : 'Couldn’t reach your Apps Script. Check the link ends in /exec, and that the deployment is set to Execute as: Me and Who has access: Anyone.');
+  }
   let j;
   try { j = await res.json(); } catch(e) { throw new Error('Unexpected reply. Check that the API link ends in /exec and the deployment has access set to Anyone.'); }
   if (!j.ok) throw new Error(j.error || 'Something went wrong.');
@@ -828,6 +861,121 @@ function addRow(v){
 
 /* ---------- Quick log from a goal ---------- */
 let QL = null;
+/* ---------- Full-screen hold timer (planks and other timed goals) ---------- */
+const HS = { phase:'idle', goal:null, name:'', t0:0, secs:0, int:null, lock:null, best:0, ref:60, today:0, beat:false, last30:0, audio:null };
+function beep(freq, dur, times){
+  try {
+    HS.audio = HS.audio || new (window.AudioContext || window.webkitAudioContext)();
+    for (let i = 0; i < (times || 1); i++) {
+      const o = HS.audio.createOscillator(), g = HS.audio.createGain(), t = HS.audio.currentTime + i * (dur + 0.08);
+      o.frequency.value = freq; o.connect(g); g.connect(HS.audio.destination);
+      g.gain.setValueAtTime(0.18, t); g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+      o.start(t); o.stop(t + dur);
+    }
+  } catch(e){}
+}
+function holdGoalLine(){
+  const g = HS.goal, p = g && (g.periods.W || g.periods.M || g.periods.Y);
+  if (!p) return '';
+  const word = g.periods.W ? 'this week' : g.periods.M ? 'this month' : 'this year';
+  return `${metricLabel(g.metric, g.kind)} ${word}: ${fmtVal(g.metric, g.kind, p.value)} of ${fmtVal(g.metric, g.kind, p.target)}`;
+}
+function openHoldTimer(g){
+  HS.goal = g; HS.name = g.exercise;
+  HS.best = (D.bestHolds || {})[g.exercise.toLowerCase()] || 0;
+  const bp = g.metric === 'Best' ? (g.periods.W || g.periods.M || g.periods.Y) : null;
+  HS.ref = bp ? bp.target : HS.best || 60;            // what the ring fills towards
+  HS.today = 0;
+  $('#hName').textContent = g.exercise;
+  $('#hGoal').textContent = holdGoalLine();
+  $('#hBest').textContent = HS.best ? mmss(HS.best) : '–';
+  $('#hRef').textContent = mmss(HS.ref);
+  $('#hCount').textContent = '0';
+  $('#holdScreen').hidden = false;
+  try { navigator.wakeLock && navigator.wakeLock.request('screen').then(l => HS.lock = l).catch(()=>{}); } catch(e){}
+  holdCountdown();
+}
+function holdCountdown(){
+  clearInterval(HS.int);
+  HS.phase = 'count'; HS.beat = false; HS.last30 = 0;
+  $('#holdScreen').classList.remove('best');
+  let n = 3;
+  $('#hLbl').textContent = 'Get ready'; $('#hTime').textContent = n; $('#hSub').textContent = 'Tap the ring to start now';
+  $('#hTime').style.color = ''; $('#hRing').style.background = 'var(--line)';
+  $('#hStop').textContent = 'Cancel'; $('#hStop').className = 'hold-stop go'; $('#hStop').disabled = false;
+  $('#hManual').hidden = false; $('#hCancel').textContent = 'Cancel';
+  beep(660, 0.08);
+  HS.int = setInterval(() => { n--; if (n <= 0) holdStart(); else { $('#hTime').textContent = n; beep(660, 0.08); } }, 1000);
+}
+function holdStart(){
+  clearInterval(HS.int);
+  HS.phase = 'run'; HS.t0 = Date.now();
+  $('#hLbl').textContent = 'Holding'; $('#hSub').textContent = HS.best ? `Beat ${mmss(HS.best)} for a new best` : 'Hold steady';
+  $('#hStop').textContent = 'Stop & log'; $('#hStop').className = 'hold-stop';
+  beep(990, 0.22);
+  const tick = () => {
+    const ms = Date.now() - HS.t0, s = Math.floor(ms / 1000), pct = Math.min(1, ms / (HS.ref * 1000));
+    $('#hTime').textContent = mmss(s);
+    $('#hTime').style.color = HS.beat ? '' : pcolor(pct);
+    $('#hRing').style.background = pct >= 1 ? pcolor(1)
+      : `conic-gradient(${hueStops(0, pct, 12)}, var(--line) ${(pct * 360).toFixed(2)}deg)`;
+    if (HS.best && !HS.beat && s > HS.best) { HS.beat = true; $('#holdScreen').classList.add('best'); $('#hSub').textContent = '🏆 New personal best! Keep going'; beep(1320, 0.12, 3); }
+    if (s && s % 30 === 0 && s !== HS.last30) { HS.last30 = s; beep(880, 0.1); }
+  };
+  tick(); HS.int = setInterval(tick, 200);
+}
+async function holdStop(){
+  if (HS.phase === 'count') { closeHoldTimer(); return; }
+  if (HS.phase === 'done') { holdCountdown(); return; }   // "Another hold"
+  if (HS.phase !== 'run' && HS.phase !== 'retry') return;
+  if (HS.phase === 'run') { clearInterval(HS.int); HS.secs = Math.round((Date.now() - HS.t0) / 1000); }
+  if (HS.secs < 1) { holdCountdown(); return; }
+  HS.phase = 'saving';
+  $('#hStop').disabled = true; $('#hStop').textContent = 'Saving…'; $('#hLbl').textContent = 'Held';
+  $('#hTime').textContent = mmss(HS.secs);
+  const g = HS.goal, before = {};
+  ['W','M','Y'].forEach(k => { if (g.periods[k]) before[k] = g.periods[k].value; });
+  const r = await act(null, 'logExercise', { name: HS.name, kind: 'time', sets: 1, seconds: HS.secs, holds: [HS.secs] }, todayStr());
+  $('#hStop').disabled = false;
+  if (!r) { HS.phase = 'retry'; $('#hStop').textContent = 'Retry saving'; $('#hSub').textContent = 'Couldn’t save that hold. Tap to try again.'; return; }
+  const newBest = HS.secs > HS.best;
+  HS.best = Math.max(HS.best, HS.secs); HS.today++;
+  HS.phase = 'done';
+  beep(newBest ? 1320 : 990, 0.14, 2);
+  $('#hLbl').textContent = r.queued ? 'Saved on your phone' : 'Logged';
+  $('#hSub').textContent = newBest ? '🏆 New personal best!' : `Best hold ${mmss(HS.best)}`;
+  $('#hBest').textContent = mmss(HS.best); $('#hCount').textContent = HS.today;
+  $('#hStop').textContent = 'Another hold'; $('#hStop').className = 'hold-stop go';
+  $('#hManual').hidden = true; $('#hCancel').textContent = 'Done';
+  if (r.dashboard) {
+    const now = r.dashboard.goals.find(x => x.id === g.id);
+    if (now) {
+      HS.goal = now; $('#hGoal').textContent = holdGoalLine();
+      ['W','M','Y'].forEach(k => {
+        const p = now.periods[k];
+        if (p && before[k] < p.target && p.value >= p.target)
+          celebrations.push({ icon:'🎯', title:`${{W:'Weekly',M:'Monthly',Y:'Yearly'}[k]} goal met`, sub:`${g.exercise}: ${fmtVal(g.metric,g.kind,p.value)}. +${D.goalXp[k]} XP` });
+      });
+      nextCelebration();
+    }
+  }
+}
+function closeHoldTimer(){
+  clearInterval(HS.int); HS.phase = 'idle';
+  try { HS.lock && HS.lock.release(); } catch(e){} HS.lock = null;
+  $('#holdScreen').hidden = true;
+}
+$('#hStop').onclick = holdStop;
+$('#hRingWrap').onclick = () => { if (HS.phase === 'count') holdStart(); };
+$('#hCancel').onclick = () => {
+  if (HS.phase === 'run' && Date.now() - HS.t0 > 5000 && !confirm('Discard this hold without logging it?')) return;
+  closeHoldTimer();
+};
+$('#hManual').onclick = () => { const g = HS.goal; closeHoldTimer(); openQuickLog(g); };
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && HS.phase === 'run') { /* timer keeps running from its start time */ }
+});
+
 function openQuickLog(g){
   QL = { goal: g, row: makeRow({ name: g.exercise, kind: g.kind }, true) };
   $('#qlBody').innerHTML = ''; $('#qlBody').appendChild(QL.row.el); renderRowBody(QL.row);
@@ -1200,7 +1348,7 @@ function renderGoals(d){
     </div>`;
   }).join('') + (missing.length ? `<p class="no-target">No ${word}ly target for ${missing.map(g => `<button data-edit="${g.id}">${esc(g.exercise)} (${esc(metricLabel(g.metric,g.kind).toLowerCase())})</button>`).join(', ')}. Tap to add one.</p>` : '');
   $$('#goalList [data-edit]').forEach(b => b.onclick = () => openGoal(d.goals.find(g => String(g.id) === b.dataset.edit)));
-  $$('#goalList [data-ql]').forEach(b => b.onclick = () => openQuickLog(d.goals.find(g => String(g.id) === b.dataset.ql)));
+  $$('#goalList [data-ql]').forEach(b => b.onclick = () => { const g = d.goals.find(x => String(x.id) === b.dataset.ql); g.kind === 'time' ? openHoldTimer(g) : openQuickLog(g); });
   $$('#goalList [data-convert]').forEach(b => b.onclick = () => openGoal(d.goals.find(g => String(g.id) === b.dataset.convert), null, true));
 }
 
@@ -1266,12 +1414,12 @@ function renderHomeGoals(d){
   $('#homeGoals').innerHTML = `<h3>Exercise goals this week <span class="small">(tap to log)</span></h3>` + wk.slice(0, 4).map(g => {
     const p = g.periods.W, pct = Math.min(100, Math.round(p.value / p.target * 100));
     return `<button class="goal goal-tap" data-ql="${g.id}"><div class="goal-top"><span>${esc(g.exercise)} <span class="small muted">${esc(metricLabel(g.metric,g.kind).toLowerCase())}</span></span>
-      <span class="num" style="font-size:18px">${fmtVal(g.metric,g.kind,p.value)}/${fmtVal(g.metric,g.kind,p.target)}${pct >= 100 ? ' ✅' : ''}<span class="plus">${isFastGoal(g) ? '⏱' : '+'}</span></span></div>
+      <span class="num" style="font-size:18px">${fmtVal(g.metric,g.kind,p.value)}/${fmtVal(g.metric,g.kind,p.target)}${pct >= 100 ? ' ✅' : ''}<span class="plus">${isFastGoal(g) ? '⏱' : g.kind === 'time' ? '▶' : '+'}</span></span></div>
       <div class="bar gold"><span style="width:${pct}%"></span></div></button>`;
   }).join('') + (wk.length > 4 ? `<button class="link" onclick="showTab('goals')">See all ${wk.length} goals</button>` : '');
   $$('#homeGoals [data-ql]').forEach(b => b.onclick = () => {
     const g = d.goals.find(x => String(x.id) === b.dataset.ql);
-    if (isFastGoal(g)) showTab('fast'); else openQuickLog(g);
+    if (isFastGoal(g)) showTab('fast'); else if (g.kind === 'time') openHoldTimer(g); else openQuickLog(g);
   });
 }
 
@@ -1502,7 +1650,7 @@ else {
 // Offline support and home-screen install
 if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 document.addEventListener('visibilitychange', () => {
-  if (!document.hidden && !EX.some(r => r.timerStart) && Date.now() - lastSync > 60000) refresh();
+  if (!document.hidden && !EX.some(r => r.timerStart) && HS.phase === 'idle' && Date.now() - lastSync > 60000) refresh();
 });
 </script>
 </body>
