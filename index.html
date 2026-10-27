@@ -1598,6 +1598,7 @@ $('#durChips').onclick = e => { const b = e.target.closest('.chip'); if (b) { S.
 $('#wDate').value = todayStr();
 xpPreview();
 /* ---------- Fast start: paint instantly, then sync in the background ---------- */
+const APP_VERSION = '1.5 (full-screen hold timer)';
 const SNAP_KEY = 'fq-dashboard-v1';
 function saveSnapshot(d){
   try { localStorage.setItem(SNAP_KEY, JSON.stringify(Object.assign({}, d, { newBadges: [] }))); } catch(e){}
@@ -1636,7 +1637,9 @@ $('#cGo').onclick = async () => {
 };
 function renderConnLine(){
   const c = cfg();
-  $('#connLine').innerHTML = c ? `Connected to Apps Script (…${esc(c.url.slice(-18))}). <button id="changeConn">Change connection</button>` : '';
+  $('#connLine').innerHTML = `App version ${APP_VERSION}. <button id="forceUpd">Check for update</button><br>` +
+    (c ? `Connected to Apps Script (…${esc(c.url.slice(-18))}). <button id="changeConn">Change connection</button>` : '');
+  $('#forceUpd').onclick = forceUpdate;
   const b = $('#changeConn');
   if (b) b.onclick = () => { if (confirm('Disconnect this phone? Your data stays in the Google Sheet.')) { setCfg(null); $('#settings').close(); showConnect(); } };
 }
@@ -1647,8 +1650,28 @@ else {
   showQueue();
   refresh();
 }
-// Offline support and home-screen install
-if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
+// Offline support and home-screen install. When a new version is published, switch to it once.
+if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let reloaded = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!hadController || reloaded || HS.phase !== 'idle' || EX.some(r => r.timerStart)) return;
+    reloaded = true; location.reload();
+  });
+  navigator.serviceWorker.register('sw.js').then(reg => {
+    reg.update().catch(() => {});
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) reg.update().catch(() => {}); });
+  }).catch(() => {});
+}
+async function forceUpdate(){
+  toast('Updating…');
+  try {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (reg) await reg.update();
+    const keys = await caches.keys(); await Promise.all(keys.map(k => caches.delete(k)));
+  } catch(e){}
+  location.reload();
+}
 document.addEventListener('visibilitychange', () => {
   if (!document.hidden && !EX.some(r => r.timerStart) && HS.phase === 'idle' && Date.now() - lastSync > 60000) refresh();
 });
