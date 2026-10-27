@@ -312,6 +312,15 @@ nav button.on .i{filter:none}
 .hold-stats div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px;text-align:center}
 .hold-stats span{display:block;font-size:12px;color:var(--muted)}
 .hold-stats b{font-size:22px}
+.hold-track{color:var(--gold);margin-top:4px}
+.music-box{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px}
+.music-name{font-weight:600;word-break:break-word}
+.music-btns{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 4px}
+.toggle{display:flex;gap:10px;align-items:center;margin-top:10px;font-size:14px}
+.toggle input{width:20px;height:20px}
+.mrow{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:10px;font-size:14px}
+.mrow .seg{flex:0 0 auto}
+.mrow .seg button{padding:7px 10px;font-size:13px}
 .hold-stop{width:100%;min-height:76px;border:0;border-radius:20px;background:var(--bad);color:#fff;font:800 28px/1 var(--display);letter-spacing:.3px}
 .hold-stop.go{background:var(--tide);color:#04202F}
 .hold-stop:disabled{opacity:.6}
@@ -533,7 +542,8 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
 <datalist id="exNames"></datalist>
 <div id="toast" role="status"></div>
 <div id="holdScreen" class="hold" hidden>
-  <div class="hold-top"><div><div class="hold-name" id="hName">Plank</div><div class="small muted" id="hGoal"></div></div><button class="hold-x" id="hCancel">Cancel</button></div>
+  <div class="hold-top"><div><div class="hold-name" id="hName">Plank</div><div class="small muted" id="hGoal"></div><div class="small hold-track" id="hTrack" hidden></div></div>
+    <div style="display:flex;gap:8px"><button class="hold-x" id="hMute" hidden aria-label="Mute music">🔊</button><button class="hold-x" id="hCancel">Cancel</button></div></div>
   <div class="hold-ring-wrap" id="hRingWrap">
     <div class="cring" id="hRing"></div>
     <div class="ring-text"><div class="lbl" id="hLbl">Get ready</div><div class="hold-time" id="hTime">3</div><div class="lbl" id="hSub">Tap to start now</div></div>
@@ -557,6 +567,24 @@ dialog::backdrop{background:rgba(0,0,0,.6)}
   <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px"><select id="setBM" aria-label="Birthday month"></select><select id="setBD" aria-label="Birthday day"></select></div>
   <p class="small muted" style="margin:6px 0 0">Monthly goals run from this day each month, and yearly goals run birthday to birthday.</p>
   <div class="row2"><button id="closeSet">Close</button><button class="go" id="saveSet">Save goals</button></div>
+
+  <label class="f" style="margin-top:22px">🎵 Hold music</label>
+  <div class="music-box">
+    <div class="music-name" id="mName">No music chosen</div>
+    <div class="music-btns">
+      <button class="chip sm" id="mPick">Choose audio file</button>
+      <button class="chip sm" id="mPreview" hidden>▶ Preview</button>
+      <button class="chip sm" id="mRemove" hidden>Remove</button>
+    </div>
+    <input type="file" id="mFile" accept="audio/*,.mp3,.m4a,.aac,.wav" hidden>
+    <div id="mOpts">
+      <label class="toggle"><input type="checkbox" id="mOn"> Play during timed holds</label>
+      <div class="mrow"><span>Start music</span><div class="seg" id="mStart"><button data-v="tap">On tap</button><button data-v="hold">At hold start</button></div></div>
+      <div class="mrow"><span>Between holds</span><div class="seg" id="mBetween"><button data-v="resume">Resume</button><button data-v="restart">Restart</button></div></div>
+      <div class="mrow"><span>Volume</span><input type="range" id="mVol" min="10" max="100" step="5" style="flex:1;max-width:60%"></div>
+    </div>
+    <p class="small muted" style="margin:10px 0 0">Saved only on this phone, never uploaded. These settings apply straight away.</p>
+  </div>
   <div class="conn-line" id="connLine"></div>
 </dialog>
 
@@ -880,6 +908,158 @@ function holdGoalLine(){
   const word = g.periods.W ? 'this week' : g.periods.M ? 'this month' : 'this year';
   return `${metricLabel(g.metric, g.kind)} ${word}: ${fmtVal(g.metric, g.kind, p.value)} of ${fmtVal(g.metric, g.kind, p.target)}`;
 }
+/* ---------- Hold music (your own file, stored only on this phone) ---------- */
+const MUSIC_CFG_KEY = 'fq-music-v1', MUSIC_POS_KEY = 'fq-music-pos';
+const MUSIC_DEFAULTS = { enabled: true, start: 'tap', between: 'resume', volume: 0.8 };
+const M = { el: null, url: null, meta: null, src: null, gain: null, graphEl: null, muted: false, playing: false, fadeT: null, startPos: 0, previewT: null };
+function musicCfg(){ try { return Object.assign({}, MUSIC_DEFAULTS, JSON.parse(localStorage.getItem(MUSIC_CFG_KEY) || '{}')); } catch(e){ return Object.assign({}, MUSIC_DEFAULTS); } }
+function setMusicCfg(patch){ try { localStorage.setItem(MUSIC_CFG_KEY, JSON.stringify(Object.assign(musicCfg(), patch))); } catch(e){} }
+
+function idb(){
+  return new Promise((res, rej) => {
+    const r = indexedDB.open('fitquest', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('media');
+    r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+  });
+}
+async function idbDo(mode, fn){
+  const db = await idb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction('media', mode), q = fn(tx.objectStore('media'));
+    tx.oncomplete = () => res(q && q.result); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error);
+  });
+}
+async function loadMusic(){
+  try {
+    const rec = await idbDo('readonly', st => st.get('holdMusic'));
+    unloadMusic();
+    if (!rec) return;
+    M.url = URL.createObjectURL(new Blob([rec.buf], { type: rec.type || 'audio/mpeg' }));
+    M.el = new Audio(); M.el.src = M.url; M.el.loop = true; M.el.preload = 'auto';
+    M.meta = { name: rec.name, size: rec.size };
+  } catch(e) { /* storage unavailable: music simply stays off */ }
+}
+function unloadMusic(){
+  try { if (M.el) M.el.pause(); } catch(e){}
+  if (M.url) URL.revokeObjectURL(M.url);
+  M.el = null; M.url = null; M.meta = null; M.playing = false;
+}
+// Route the audio through Web Audio so fades and volume work on iPhone
+function musicGraph(){
+  if (!M.el) return;
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = 'playback';   // play even with the silent switch on (iOS 17+)
+    HS.audio = HS.audio || new (window.AudioContext || window.webkitAudioContext)();
+    if (HS.audio.state === 'suspended') HS.audio.resume();
+    if (M.graphEl !== M.el) {
+      M.src = HS.audio.createMediaElementSource(M.el);
+      M.gain = HS.audio.createGain(); M.gain.gain.value = 0;
+      M.src.connect(M.gain); M.gain.connect(HS.audio.destination);
+      M.graphEl = M.el;
+    }
+  } catch(e) { M.gain = null; M.graphEl = null; }
+}
+function musicLevel(v, secs){
+  if (M.gain && HS.audio) {
+    const t = HS.audio.currentTime, g = M.gain.gain;
+    g.cancelScheduledValues(t); g.setValueAtTime(g.value, t); g.linearRampToValueAtTime(v, t + (secs || 0.01));
+  } else if (M.el) { try { M.el.volume = v; } catch(e){} }
+}
+const musicPosKey = () => MUSIC_POS_KEY + ':' + (M.meta ? M.meta.name : '');
+function musicReady(){ return !!(M.el && musicCfg().enabled); }
+
+// Called from a tap (iPhone only allows audio to start from a tap)
+function musicStart(){
+  if (!musicReady()) return;
+  const c = musicCfg();
+  clearTimeout(M.fadeT); clearTimeout(M.previewT);
+  musicGraph();
+  M.startPos = c.between === 'resume' ? Number(localStorage.getItem(musicPosKey()) || 0) : 0;
+  try { M.el.currentTime = M.startPos; } catch(e){}
+  musicLevel(0, 0.01);
+  const p = M.el.play();
+  if (p && p.catch) p.catch(() => toast('Music couldn’t start. Tap 🔊 to try again.', true));
+  M.playing = true;
+  if (c.start === 'tap' && !M.muted) musicLevel(c.volume, 0.8);
+  showMuteBtn();
+}
+// Called when the hold itself begins (after the countdown)
+function musicHoldBegan(){
+  if (!M.playing) return;
+  const c = musicCfg();
+  if (c.start === 'hold') { try { M.el.currentTime = M.startPos; } catch(e){} if (!M.muted) musicLevel(c.volume, 0.5); }
+}
+function musicStop(){
+  if (!M.el || !M.playing) return;
+  M.playing = false;
+  if (musicCfg().between === 'resume') { try { localStorage.setItem(musicPosKey(), String(M.el.currentTime || 0)); } catch(e){} }
+  musicLevel(0, 1.2);
+  clearTimeout(M.fadeT);
+  M.fadeT = setTimeout(() => { try { M.el.pause(); } catch(e){} }, M.gain ? 1250 : 0);
+}
+function showMuteBtn(){
+  const on = musicReady();
+  $('#hMute').hidden = !on; $('#hTrack').hidden = !on;
+  if (on) { $('#hMute').textContent = M.muted ? '🔇' : '🔊'; $('#hTrack').textContent = '♪ ' + M.meta.name; }
+}
+$('#hMute').onclick = () => {
+  if (!M.playing) { M.muted = false; musicStart(); if (HS.phase === 'run') musicHoldBegan(); return; }
+  M.muted = !M.muted;
+  const c = musicCfg(), waiting = HS.phase === 'count' && c.start === 'hold';
+  musicLevel(M.muted || waiting ? 0 : c.volume, 0.3);
+  showMuteBtn();
+};
+
+/* Settings: choose, preview, change or remove the file */
+function renderMusicSettings(){
+  const c = musicCfg(), has = !!M.meta;
+  $('#mName').textContent = has ? `${M.meta.name} (${(M.meta.size / 1048576).toFixed(1)} MB)` : 'No music chosen';
+  $('#mPick').textContent = has ? 'Change file' : 'Choose audio file';
+  $('#mPreview').hidden = !has; $('#mRemove').hidden = !has;
+  $('#mOpts').style.opacity = has ? '1' : '.45';
+  $('#mOn').checked = c.enabled;
+  $$('#mStart button').forEach(b => b.classList.toggle('on', b.dataset.v === c.start));
+  $$('#mBetween button').forEach(b => b.classList.toggle('on', b.dataset.v === c.between));
+  $('#mVol').value = Math.round(c.volume * 100);
+}
+$('#mPick').onclick = () => $('#mFile').click();
+$('#mFile').onchange = async () => {
+  const f = $('#mFile').files[0]; $('#mFile').value = '';
+  if (!f) return;
+  if (f.size > 80 * 1048576) { toast('That file is over 80 MB. Choose a smaller one.', true); return; }
+  try {
+    const buf = await f.arrayBuffer();
+    const name = f.name.replace(/\.[^.]+$/, '');
+    await idbDo('readwrite', st => st.put({ name, type: f.type || 'audio/mpeg', size: f.size, buf }, 'holdMusic'));
+    try { localStorage.removeItem(MUSIC_POS_KEY + ':' + name); } catch(e){}
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist(); } catch(e){}
+    await loadMusic();
+    setMusicCfg({ enabled: true });
+    renderMusicSettings();
+    toast('Hold music saved on this phone');
+  } catch(e) { toast('Couldn’t save that file. Try an MP3 or M4A.', true); }
+};
+$('#mPreview').onclick = () => {
+  if (!M.el) return;
+  if (!M.el.paused && M.previewT) { clearTimeout(M.previewT); M.previewT = null; musicLevel(0, 0.4); setTimeout(() => M.el.pause(), 450); $('#mPreview').textContent = '▶ Preview'; return; }
+  musicGraph();
+  try { M.el.currentTime = 0; } catch(e){}
+  M.el.play().catch(() => toast('Couldn’t play that file.', true));
+  musicLevel(musicCfg().volume, 0.5);
+  $('#mPreview').textContent = '■ Stop';
+  M.previewT = setTimeout(() => { musicLevel(0, 0.8); setTimeout(() => M.el && M.el.pause(), 850); $('#mPreview').textContent = '▶ Preview'; M.previewT = null; }, 15000);
+};
+$('#mRemove').onclick = async () => {
+  if (!confirm('Remove the hold music from this phone?')) return;
+  try { await idbDo('readwrite', st => st.delete('holdMusic')); } catch(e){}
+  unloadMusic(); renderMusicSettings(); toast('Hold music removed');
+};
+$('#mOn').onchange = () => setMusicCfg({ enabled: $('#mOn').checked });
+$('#mStart').onclick = e => { const b = e.target.closest('button'); if (b) { setMusicCfg({ start: b.dataset.v }); renderMusicSettings(); } };
+$('#mBetween').onclick = e => { const b = e.target.closest('button'); if (b) { setMusicCfg({ between: b.dataset.v }); renderMusicSettings(); } };
+$('#mVol').oninput = () => { const v = Number($('#mVol').value) / 100; setMusicCfg({ volume: v }); if (M.el && !M.el.paused) musicLevel(v, 0.2); };
+loadMusic();
+
 function openHoldTimer(g){
   HS.goal = g; HS.name = g.exercise;
   HS.best = (D.bestHolds || {})[g.exercise.toLowerCase()] || 0;
@@ -892,11 +1072,13 @@ function openHoldTimer(g){
   $('#hRef').textContent = mmss(HS.ref);
   $('#hCount').textContent = '0';
   $('#holdScreen').hidden = false;
+  M.muted = false; showMuteBtn();
   try { navigator.wakeLock && navigator.wakeLock.request('screen').then(l => HS.lock = l).catch(()=>{}); } catch(e){}
   holdCountdown();
 }
 function holdCountdown(){
   clearInterval(HS.int);
+  musicStart();
   HS.phase = 'count'; HS.beat = false; HS.last30 = 0;
   $('#holdScreen').classList.remove('best');
   let n = 3;
@@ -910,6 +1092,7 @@ function holdCountdown(){
 function holdStart(){
   clearInterval(HS.int);
   HS.phase = 'run'; HS.t0 = Date.now();
+  musicHoldBegan();
   $('#hLbl').textContent = 'Holding'; $('#hSub').textContent = HS.best ? `Beat ${mmss(HS.best)} for a new best` : 'Hold steady';
   $('#hStop').textContent = 'Stop & log'; $('#hStop').className = 'hold-stop';
   beep(990, 0.22);
@@ -931,6 +1114,7 @@ async function holdStop(){
   if (HS.phase === 'run') { clearInterval(HS.int); HS.secs = Math.round((Date.now() - HS.t0) / 1000); }
   if (HS.secs < 1) { holdCountdown(); return; }
   HS.phase = 'saving';
+  musicStop();
   $('#hStop').disabled = true; $('#hStop').textContent = 'Saving…'; $('#hLbl').textContent = 'Held';
   $('#hTime').textContent = mmss(HS.secs);
   const g = HS.goal, before = {};
@@ -962,6 +1146,7 @@ async function holdStop(){
 }
 function closeHoldTimer(){
   clearInterval(HS.int); HS.phase = 'idle';
+  musicStop();
   try { HS.lock && HS.lock.release(); } catch(e){} HS.lock = null;
   $('#holdScreen').hidden = true;
 }
@@ -1576,8 +1761,8 @@ function nextCelebration(){
 $('#celebrate').onclick = () => { $('#celebrate').classList.remove('show'); setTimeout(nextCelebration, 150); };
 
 /* ---------- Settings ---------- */
-$('#openSettings').onclick = () => { renderConnLine(); $('#settings').showModal(); };
-$('#closeSet').onclick = () => $('#settings').close();
+$('#openSettings').onclick = () => { renderConnLine(); renderMusicSettings(); $('#settings').showModal(); };
+$('#closeSet').onclick = () => { if (M.previewT) $('#mPreview').click(); $('#settings').close(); };
 $('#saveSet').onclick = e => act(e.currentTarget, 'saveSettings', { workoutGoal: $('#setW').value, fastGoal: $('#setF').value, defaultFast: $('#setD').value, birthday: `${$('#setBM').value}-${$('#setBD').value}` })
   .then(r => { if (r) $('#settings').close(); });
 
@@ -1598,7 +1783,7 @@ $('#durChips').onclick = e => { const b = e.target.closest('.chip'); if (b) { S.
 $('#wDate').value = todayStr();
 xpPreview();
 /* ---------- Fast start: paint instantly, then sync in the background ---------- */
-const APP_VERSION = '1.5 (full-screen hold timer)';
+const APP_VERSION = '1.6 (hold music)';
 const SNAP_KEY = 'fq-dashboard-v1';
 function saveSnapshot(d){
   try { localStorage.setItem(SNAP_KEY, JSON.stringify(Object.assign({}, d, { newBadges: [] }))); } catch(e){}
